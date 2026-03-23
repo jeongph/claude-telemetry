@@ -7,31 +7,6 @@ Opus │ main ↑1 +3/-1
 ◷ Elapsed 12m34s │ ◆ Context ▰▰▱▱▱ 35% (1M) │ 5h ▰▱▱▱▱ 24%  7d ▰▰▰▰▱ 71%
 ```
 
-## Features
-
-- **Multi-line layout** — identity & git on top, session metrics below
-- **Git integration** — branch, ahead/behind (↑↓), uncommitted changes (+/-)
-- **Color-coded thresholds** — green/yellow/red for context, rate limits, cost
-- **Progress bars** — ▰▱ visualization for usage percentages
-- **Adaptive width** — auto-drops lower priority sections on narrow terminals
-- **i18n** — English, Korean, Japanese, Chinese (auto-detected)
-- **Configurable** — toggle sections, bar width, colors, language
-
-## Sections
-
-| Line | Section | Description |
-|------|---------|-------------|
-| 1 | Model | Current model name |
-| 1 | Git | Branch + ↑push/↓pull + changes (+/-) |
-| 1 | Agent | Active agent name |
-| 1 | Vim | Vim mode indicator |
-| 2 | Elapsed | Session duration |
-| 2 | Context | Context window usage with bar |
-| 2 | Rate Limits | 5h / 7d rolling window usage |
-| 2 | Warning | 200k token exceeded alert |
-| 2 | Cost | Session cost in USD (API key users) |
-| 2 | Tokens | Input/output token details |
-
 ## Installation
 
 ### Via marketplace (recommended)
@@ -71,6 +46,31 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 ```
 
 4. Restart Claude Code
+
+## Features
+
+- **Multi-line layout** — identity & git on top, session metrics below
+- **Git integration** — branch, ahead/behind (↑↓), uncommitted changes (+/-)
+- **Color-coded thresholds** — green/yellow/red for context, rate limits, cost
+- **Progress bars** — ▰▱ visualization for usage percentages
+- **Adaptive width** — auto-drops lower priority sections on narrow terminals
+- **i18n** — English, Korean, Japanese, Chinese (auto-detected)
+- **Configurable** — toggle sections, bar width, colors, language
+
+## Sections
+
+| Line | Section | Description |
+|------|---------|-------------|
+| 1 | Model | Current model name |
+| 1 | Git | Branch + ↑push/↓pull + changes (+/-) |
+| 1 | Agent | Active agent name |
+| 1 | Vim | Vim mode indicator |
+| 2 | Elapsed | Session duration |
+| 2 | Context | Context window usage with bar |
+| 2 | Rate Limits | 5h / 7d rolling window usage |
+| 2 | Warning | 200k token exceeded alert |
+| 2 | Cost | Session cost in USD (API key users) |
+| 2 | Tokens | Input/output token details |
 
 ## Setup
 
