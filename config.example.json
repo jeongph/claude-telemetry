@@ -1,0 +1,19 @@
+{
+  "sections": {
+    "git": true,
+    "context": true,
+    "rate_limits": true,
+    "duration": true,
+    "lines": false,
+    "warn_200k": true,
+    "cost": false,
+    "api_duration": false,
+    "tokens": false,
+    "agent": true,
+    "vim_mode": true
+  },
+  "colors": true,
+  "bar_width": 5,
+  "separator": " \u2502 ",
+  "language": "en"
+}
