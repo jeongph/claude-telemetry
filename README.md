@@ -12,11 +12,15 @@ Opus │ ◷ Elapsed 12m34s │ main ↑1 +3/-1
 
 ### Via marketplace (recommended)
 
-```bash
-# 1. Add marketplace
-/plugin marketplace add jeongph/claude-telemetry
+1. Add marketplace:
 
-# 2. Install
+```
+/plugin marketplace add jeongph/claude-telemetry
+```
+
+2. Install:
+
+```
 /plugin install claude-telemetry@jeongph-claude-telemetry
 ```
 
@@ -32,17 +36,18 @@ git clone https://github.com/jeongph/claude-telemetry.git
 
 ```bash
 mkdir -p ~/.claude/statusline
+```
+
+```bash
 cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 ```
 
 3. Add to `~/.claude/settings.json`:
 
 ```json
-{
-  "statusLine": {
-    "type": "command",
-    "command": "bash /path/to/claude-telemetry/scripts/run.sh"
-  }
+"statusLine": {
+  "type": "command",
+  "command": "bash /path/to/claude-telemetry/scripts/run.sh"
 }
 ```
 
