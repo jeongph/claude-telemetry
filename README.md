@@ -5,6 +5,7 @@ Customizable multi-line status line for [Claude Code](https://claude.com/claude-
 ```
 Opus │ ◷ Elapsed 12m34s │ main ↑1 +3/-1
 ◆ Context ▰▰▱▱▱ 35% (1M) │ 5h ▰▱▱▱▱ 24%  7d ▰▰▰▰▱ 71%
+▶ code-explorer │ NORMAL
 ```
 
 ## Installation
@@ -49,7 +50,8 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 
 ## Features
 
-- **Multi-line layout** — identity & git on top, session metrics below
+- **Multi-line layout** — identity & git on top, metrics in the middle, agent/vim at the bottom
+- **Auto user detection** — OAuth users see rate limits, API key users see cost automatically
 - **Git integration** — branch, ahead/behind (↑↓), uncommitted changes (+/-)
 - **Color-coded thresholds** — green/yellow/red based on usage percentage
 - **200k token warning** — context size label turns bold yellow when exceeded
@@ -65,14 +67,16 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 | 1 | Model | Current model name |
 | 1 | Elapsed | Session duration |
 | 1 | Git | Branch + ↑push/↓pull + changes (+/-) |
-| 1 | Agent | Active agent name |
-| 1 | Vim | Vim mode indicator |
 | 2 | Context | Context window usage with bar (size label turns yellow when >200k) |
-| 2 | Rate Limits | 5h / 7d rolling window usage |
+| 2 | Rate Limits | 5h / 7d rolling window usage (OAuth users only, auto-detected) |
+| 2 | Cost | Session cost in USD (API key users only, auto-detected) |
 | 2 | Lines | Session lines added/removed |
-| 2 | Cost | Session cost in USD (API key users) |
 | 2 | API Duration | Time spent waiting for API responses |
 | 2 | Tokens | Input/output token details |
+| 3 | Agent | Active agent name (shown only when active) |
+| 3 | Vim | Vim mode indicator (shown only when active) |
+
+Lines 2 and 3 appear only when there is data to display.
 
 ## Setup
 
@@ -100,6 +104,8 @@ Or edit `~/.claude/statusline/config.json` directly:
   "language": "en"
 }
 ```
+
+> **Note:** `rate_limits` and `cost` are auto-detected by user type. OAuth (Pro/Max) users see rate limits; API key users see cost. The config toggle only applies when the section is relevant to your user type.
 
 ## Requirements
 
