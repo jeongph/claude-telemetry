@@ -22,39 +22,43 @@
   <circle cx="56" cy="15" r="6" fill="#28c840"/>
   <text x="360" y="19" text-anchor="middle" class="t dim" font-size="11">claude-telemetry</text>
 
-  <!-- Line 1: Model │ Elapsed │ Git -->
+  <!-- Line 1: Model │ Elapsed │ folder:branch ↑1 +3/-1 ?2 ≡1 -->
   <text x="18" y="58" class="t">
     <tspan class="cyn">Opus</tspan>
     <tspan class="dim"> │ </tspan>
     <tspan class="dim">◷ Elapsed </tspan>
-    <tspan class="wht">12m34s</tspan>
+    <tspan class="wht">12</tspan><tspan class="dim">m </tspan><tspan class="wht">34</tspan><tspan class="dim">s</tspan>
     <tspan class="dim"> │ </tspan>
-    <tspan class="mag">main</tspan>
+    <tspan class="wht">my-project</tspan><tspan class="dim">:</tspan><tspan class="mag">main</tspan>
     <tspan class="ylw"> ↑1</tspan>
     <tspan> </tspan>
     <tspan class="grn">+3</tspan>
     <tspan class="dim">/</tspan>
     <tspan class="red">-1</tspan>
+    <tspan class="dim"> ?</tspan><tspan class="ylw">2</tspan>
+    <tspan class="dim"> ≡</tspan><tspan class="mag">1</tspan>
   </text>
 
-  <!-- Line 2: Context │ Rate limits -->
+  <!-- Line 2: Context remaining │ Rate limits remaining -->
   <text x="18" y="84" class="t">
     <tspan class="cyn">◆ </tspan>
     <tspan class="dim">Context </tspan>
-    <tspan class="grn">▰▰</tspan>
-    <tspan class="bar-e">▱▱▱</tspan>
-    <tspan class="grn"> 35%</tspan>
+    <tspan class="grn">▰▰▰</tspan>
+    <tspan class="bar-e">▱▱</tspan>
+    <tspan class="grn"> 66%</tspan>
     <tspan class="dim"> (1M)</tspan>
     <tspan class="dim"> │ </tspan>
-    <tspan class="dim">5h </tspan>
-    <tspan class="grn">▰</tspan>
-    <tspan class="bar-e">▱▱▱▱</tspan>
-    <tspan class="grn"> 24%</tspan>
-    <tspan>  </tspan>
-    <tspan class="dim">7d </tspan>
-    <tspan class="ylw">▰▰▰▰</tspan>
+    <tspan class="wht">2</tspan><tspan class="dim">h </tspan><tspan class="wht">12</tspan><tspan class="dim">m</tspan>
+    <tspan class="dim">/5h </tspan>
+    <tspan class="grn">▰▰▰▰</tspan>
     <tspan class="bar-e">▱</tspan>
-    <tspan class="ylw"> 71%</tspan>
+    <tspan class="grn"> 77%</tspan>
+    <tspan>  </tspan>
+    <tspan class="wht">3</tspan><tspan class="dim">d </tspan><tspan class="wht">4</tspan><tspan class="dim">h</tspan>
+    <tspan class="dim">/7d </tspan>
+    <tspan class="ylw">▰</tspan>
+    <tspan class="bar-e">▱▱▱▱</tspan>
+    <tspan class="ylw"> 29%</tspan>
   </text>
 
   <!-- Line 3: Agent │ Vim -->

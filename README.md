@@ -65,26 +65,26 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 
 ## Features
 
-- **Multi-line layout** — identity & git on top, metrics in the middle, agent/vim at the bottom
-- **Auto user detection** — OAuth users see rate limits, API key users see cost automatically
-- **Git integration** — branch, ahead/behind (↑↓), uncommitted changes (+/-)
-- **Color-coded thresholds** — green/yellow/red based on usage percentage
+- **Remaining % display** — all bars show remaining capacity (like a battery), not usage
+- **Auto user detection** — OAuth users see rate limits, API key users see cost
+- **Git integration** — folder:branch, ↑push/↓pull, changes (+/-), untracked (?N), stash (≡N)
+- **Rate limit countdown** — remaining time until reset (2h 12m/5h)
 - **200k token warning** — context size label turns bold yellow when exceeded
-- **Progress bars** — ▰▱ visualization for usage percentages
+- **Progress bars** — ▰▱ visualization, color-coded green → yellow → red
 - **Adaptive width** — auto-drops lower priority sections on narrow terminals
 - **i18n** — English, Korean, Japanese, Chinese (auto-detected)
-- **Configurable** — toggle sections, bar width, colors, language
+- **Configurable** — toggle sections, bar width, colors, language, user type
 
 ## Sections
 
 | Line | Section | Description |
 |------|---------|-------------|
 | 1 | Model | Current model name |
-| 1 | Elapsed | Session duration |
-| 1 | Git | Branch + ↑push/↓pull + changes (+/-) |
-| 2 | Context | Context window usage with bar (size label turns yellow when >200k) |
-| 2 | Rate Limits | 5h / 7d rolling window usage (OAuth users only, auto-detected) |
-| 2 | Cost | Session cost in USD (API key users only, auto-detected) |
+| 1 | Elapsed | Session duration (Nh Nm format) |
+| 1 | Git | folder:branch ↑push ↓pull +add/-del ?untracked ≡stash |
+| 2 | Context | Remaining context window % with bar (yellow when >200k) |
+| 2 | Rate Limits | Remaining 5h / 7d % with reset countdown (OAuth, auto-detected) |
+| 2 | Cost | Session cost in USD (API key, auto-detected) |
 | 2 | Lines | Session lines added/removed |
 | 2 | API Duration | Time spent waiting for API responses |
 | 2 | Tokens | Input/output token details |
@@ -116,11 +116,12 @@ Or edit `~/.claude/statusline/config.json` directly:
   "colors": true,
   "bar_width": 5,
   "separator": " │ ",
-  "language": "en"
+  "language": "en",
+  "user_type": "auto"
 }
 ```
 
-> **Note:** `rate_limits` and `cost` are auto-detected by user type. OAuth (Pro/Max) users see rate limits; API key users see cost. The config toggle only applies when the section is relevant to your user type.
+> **Note:** `user_type` can be `"auto"`, `"oauth"`, or `"api"`. Auto detects by `rate_limits` presence. Set `"oauth"` to prevent cost showing at session start before rate limits data arrives.
 
 ## Requirements
 
