@@ -212,15 +212,15 @@ def dw:
         if . then
           (.used_percentage // 0) as $pct |
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
-          D + "5h " + R + ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R +
-          (if $reset then D + " \u21bb" + $reset + R else "" end)
+          D + (if $reset then $reset + "/" else "" end) + "5h " + R +
+          ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R
         else empty end),
       ($d.rate_limits.seven_day // null |
         if . then
           (.used_percentage // 0) as $pct |
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
-          D + "7d " + R + ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R +
-          (if $reset then D + " \u21bb" + $reset + R else "" end)
+          D + (if $reset then $reset + "/" else "" end) + "7d " + R +
+          ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R
         else empty end)
     ] | if length > 0 then {ord:2, pri:2, txt: (join("  "))} else empty end
   else empty end),
