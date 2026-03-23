@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude Code custom status line (2-line layout)
+# Claude Code custom status line (multi-line layout)
 # Line 1: Model │ Git branch +/-
 # Line 2: Elapsed │ Context │ Rate limits
 # Config: ~/.claude/statusline/config.json

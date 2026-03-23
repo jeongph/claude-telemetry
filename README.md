@@ -1,6 +1,6 @@
 # claude-telemetry
 
-Customizable 2-line status line for [Claude Code](https://claude.com/claude-code).
+Customizable multi-line status line for [Claude Code](https://claude.com/claude-code).
 
 ```
 Opus │ main +3/-1
@@ -9,7 +9,7 @@ Opus │ main +3/-1
 
 ## Features
 
-- **2-line layout** — Line 1: model + git, Line 2: session metrics
+- **Multi-line layout** — identity & git on top, session metrics below
 - **Git integration** — branch name + uncommitted changes (+/-)
 - **Color-coded thresholds** — green/yellow/red for context, rate limits, cost
 - **Progress bars** — ▰▱ visualization for usage percentages
