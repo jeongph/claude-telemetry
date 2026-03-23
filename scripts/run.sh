@@ -184,14 +184,13 @@ def dw:
     ($d.context_window.used_percentage // null) as $pct |
     ($d.context_window.context_window_size // null) as $sz |
     if $pct and $sz then
+      ($d.exceeds_200k_tokens == true) as $over |
       {ord:1, pri:1, txt: (
         cyn + "\u25c6 " + D + l("ctx") + " " + R +
         ($pct | bar) + " " +
         ($pct | tc) + "\($pct | round)%" + R +
-        D + " (\($sz | fmt_k))" + R +
-        (if $d.exceeds_200k_tokens == true then
-          " " + c("1;31") + "\u25b2 " + l("warn") + R
-        else "" end))}
+        (if $over then c("1;33") else D end) +
+        " (\($sz | fmt_k))" + R)}
     else empty end
   else empty end),
 
