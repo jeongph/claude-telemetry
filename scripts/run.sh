@@ -37,10 +37,14 @@ GIT_ADD=0
 GIT_DEL=0
 GIT_AHEAD=0
 GIT_BEHIND=0
+GIT_UNTRACKED=0
+GIT_STASH=0
 if git -C "$CWD" rev-parse --is-inside-work-tree &>/dev/null; then
   GIT_BRANCH=$(git -C "$CWD" rev-parse --abbrev-ref HEAD 2>/dev/null)
   read -r GIT_ADD GIT_DEL <<< "$({ git -C "$CWD" diff --numstat 2>/dev/null; git -C "$CWD" diff --cached --numstat 2>/dev/null; } | awk '{a+=$1; d+=$2} END {print a+0, d+0}')"
   read -r GIT_AHEAD GIT_BEHIND <<< "$(git -C "$CWD" rev-list --left-right --count HEAD...@{u} 2>/dev/null || echo "0 0")"
+  GIT_UNTRACKED=$(git -C "$CWD" ls-files --others --exclude-standard 2>/dev/null | wc -l)
+  GIT_STASH=$(git -C "$CWD" stash list 2>/dev/null | wc -l)
 fi
 
 echo "$INPUT" | jq -r \
@@ -52,6 +56,8 @@ echo "$INPUT" | jq -r \
   --argjson git_del "${GIT_DEL:-0}" \
   --argjson git_ahead "${GIT_AHEAD:-0}" \
   --argjson git_behind "${GIT_BEHIND:-0}" \
+  --argjson git_untracked "${GIT_UNTRACKED:-0}" \
+  --argjson git_stash "${GIT_STASH:-0}" \
 '
 
 # ── Config ──
@@ -94,13 +100,26 @@ def L:
 def l(k): L[k] // k;
 
 # ── Helpers ──
+# Color by usage threshold (higher = worse)
 def tc: if . >= 80 then red elif . >= 50 then ylw else grn end;
+# Color by remaining threshold (lower = worse)
+def tc_rem: if . <= 20 then red elif . <= 50 then ylw else grn end;
 
+# Usage bar (fills up as value increases)
 def bar:
   . as $pct | bw as $w |
   ($pct / 100 * $w + 0.5 | floor | [., 0] | max | [., $w] | min) as $f |
   ($w - $f) as $e |
   ($pct | tc) +
+  ([range($f)] | map("\u25b0") | join("")) +
+  D + ([range($e)] | map("\u25b1") | join("")) + R;
+
+# Remaining bar (drains as value decreases)
+def bar_rem:
+  . as $pct | bw as $w |
+  ($pct / 100 * $w + 0.5 | floor | [., 0] | max | [., $w] | min) as $f |
+  ($w - $f) as $e |
+  ($pct | tc_rem) +
   ([range($f)] | map("\u25b0") | join("")) +
   D + ([range($e)] | map("\u25b1") | join("")) + R;
 
@@ -180,7 +199,9 @@ def dw:
      else "" end) +
      (if $git_add > 0 or $git_del > 0 then
        " " + grn + "+\($git_add)" + R + D + "/" + R + red + "-\($git_del)" + R
-     else "" end)
+     else "" end) +
+     (if $git_untracked > 0 then D + " ?" + R + ylw + "\($git_untracked)" + R else "" end) +
+     (if $git_stash > 0 then D + " \u2261" + R + mag + "\($git_stash)" + R else "" end)
    else
      # No git — show folder name only
      (($d.cwd // $d.workspace.project_dir // null) |
@@ -197,13 +218,13 @@ def dw:
 
 ([
   (if on("context") then
-    ($d.context_window.used_percentage // 0) as $pct |
+    (100 - ($d.context_window.used_percentage // 0)) as $rem |
     ($d.context_window.context_window_size // null) as $sz |
     ($d.exceeds_200k_tokens == true) as $over |
     {ord:1, pri:1, txt: (
       cyn + "\u25c6 " + D + l("ctx") + " " + R +
-      ($pct | bar) + " " +
-      ($pct | tc) + "\($pct | round)%" + R +
+      ($rem | bar_rem) + " " +
+      ($rem | tc_rem) + "\($rem | round)%" + R +
       (if $sz then
         (if $over then c("1;33") else D end) + " (\($sz | fmt_k))" + R
       else "" end))}
