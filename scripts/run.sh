@@ -168,7 +168,7 @@ def dw:
 
    # Folder:branch + sync + diff
    (if on("git") and $git_branch != "" then
-     (($d.workspace.project_dir // $d.cwd // null) |
+     (($d.cwd // $d.workspace.project_dir // null) |
        if . then split("/") | last else null end
      ) as $folder |
      (if $folder then wht + $folder + D + ":" + R else "" end) +
@@ -183,7 +183,7 @@ def dw:
      else "" end)
    else
      # No git — show folder name only
-     (($d.workspace.project_dir // $d.cwd // null) |
+     (($d.cwd // $d.workspace.project_dir // null) |
        if . then split("/") | last else null end
      ) | if . then wht + . + R else empty end
    end)
