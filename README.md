@@ -3,8 +3,8 @@
 Customizable multi-line status line for [Claude Code](https://claude.com/claude-code).
 
 ```
-Opus │ main ↑1 +3/-1
-◷ Elapsed 12m34s │ ◆ Context ▰▰▱▱▱ 35% (1M) │ 5h ▰▱▱▱▱ 24%  7d ▰▰▰▰▱ 71%
+Opus │ ◷ Elapsed 12m34s │ main ↑1 +3/-1
+◆ Context ▰▰▱▱▱ 35% (1M) │ 5h ▰▱▱▱▱ 24%  7d ▰▰▰▰▱ 71%
 ```
 
 ## Installation
@@ -51,7 +51,8 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 
 - **Multi-line layout** — identity & git on top, session metrics below
 - **Git integration** — branch, ahead/behind (↑↓), uncommitted changes (+/-)
-- **Color-coded thresholds** — green/yellow/red for context, rate limits, cost
+- **Color-coded thresholds** — green/yellow/red based on usage percentage
+- **200k token warning** — context size label turns bold yellow when exceeded
 - **Progress bars** — ▰▱ visualization for usage percentages
 - **Adaptive width** — auto-drops lower priority sections on narrow terminals
 - **i18n** — English, Korean, Japanese, Chinese (auto-detected)
@@ -62,14 +63,15 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 | Line | Section | Description |
 |------|---------|-------------|
 | 1 | Model | Current model name |
+| 1 | Elapsed | Session duration |
 | 1 | Git | Branch + ↑push/↓pull + changes (+/-) |
 | 1 | Agent | Active agent name |
 | 1 | Vim | Vim mode indicator |
-| 2 | Elapsed | Session duration |
-| 2 | Context | Context window usage with bar |
+| 2 | Context | Context window usage with bar (size label turns yellow when >200k) |
 | 2 | Rate Limits | 5h / 7d rolling window usage |
-| 2 | Warning | 200k token exceeded alert |
+| 2 | Lines | Session lines added/removed |
 | 2 | Cost | Session cost in USD (API key users) |
+| 2 | API Duration | Time spent waiting for API responses |
 | 2 | Tokens | Input/output token details |
 
 ## Setup
@@ -86,7 +88,6 @@ Or edit `~/.claude/statusline/config.json` directly:
     "rate_limits": true,
     "duration": true,
     "lines": false,
-    "warn_200k": true,
     "cost": false,
     "api_duration": false,
     "tokens": false,
