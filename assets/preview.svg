@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="138" viewBox="0 0 720 138">
+  <style>
+    .t { font-family: 'SF Mono', 'Menlo', 'Cascadia Code', 'Consolas', monospace; font-size: 13px; }
+    .dim { fill: #6b7280; }
+    .wht { fill: #c9d1d9; }
+    .cyn { fill: #56d4dd; font-weight: bold; }
+    .mag { fill: #d2a8ff; }
+    .grn { fill: #7ee787; }
+    .ylw { fill: #e3b341; }
+    .red { fill: #f47067; }
+    .bar-e { fill: #3b3f4a; }
+  </style>
+
+  <!-- Terminal window -->
+  <rect width="720" height="138" rx="10" fill="#161b22"/>
+
+  <!-- Title bar -->
+  <rect width="720" height="30" rx="10" fill="#21262d"/>
+  <rect y="20" width="720" height="10" fill="#21262d"/>
+  <circle cx="20" cy="15" r="6" fill="#ff5f57"/>
+  <circle cx="38" cy="15" r="6" fill="#febc2e"/>
+  <circle cx="56" cy="15" r="6" fill="#28c840"/>
+  <text x="360" y="19" text-anchor="middle" class="t dim" font-size="11">claude-telemetry</text>
+
+  <!-- Line 1: Model │ Elapsed │ Git -->
+  <text x="18" y="58" class="t">
+    <tspan class="cyn">Opus</tspan>
+    <tspan class="dim"> │ </tspan>
+    <tspan class="dim">◷ Elapsed </tspan>
+    <tspan class="wht">12m34s</tspan>
+    <tspan class="dim"> │ </tspan>
+    <tspan class="mag">main</tspan>
+    <tspan class="ylw"> ↑1</tspan>
+    <tspan> </tspan>
+    <tspan class="grn">+3</tspan>
+    <tspan class="dim">/</tspan>
+    <tspan class="red">-1</tspan>
+  </text>
+
+  <!-- Line 2: Context │ Rate limits -->
+  <text x="18" y="84" class="t">
+    <tspan class="cyn">◆ </tspan>
+    <tspan class="dim">Context </tspan>
+    <tspan class="grn">▰▰</tspan>
+    <tspan class="bar-e">▱▱▱</tspan>
+    <tspan class="grn"> 35%</tspan>
+    <tspan class="dim"> (1M)</tspan>
+    <tspan class="dim"> │ </tspan>
+    <tspan class="dim">5h </tspan>
+    <tspan class="grn">▰</tspan>
+    <tspan class="bar-e">▱▱▱▱</tspan>
+    <tspan class="grn"> 24%</tspan>
+    <tspan>  </tspan>
+    <tspan class="dim">7d </tspan>
+    <tspan class="ylw">▰▰▰▰</tspan>
+    <tspan class="bar-e">▱</tspan>
+    <tspan class="ylw"> 71%</tspan>
+  </text>
+
+  <!-- Line 3: Agent │ Vim -->
+  <text x="18" y="110" class="t">
+    <tspan class="dim">▶ </tspan>
+    <tspan class="mag">code-explorer</tspan>
+    <tspan class="dim"> │ </tspan>
+    <tspan class="cyn">NORMAL</tspan>
+  </text>
+</svg>

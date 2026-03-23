@@ -2,11 +2,9 @@
 
 Customizable multi-line status line for [Claude Code](https://claude.com/claude-code).
 
-```
-Opus │ ◷ Elapsed 12m34s │ main ↑1 +3/-1
-◆ Context ▰▰▱▱▱ 35% (1M) │ 5h ▰▱▱▱▱ 24%  7d ▰▰▰▰▱ 71%
-▶ code-explorer │ NORMAL
-```
+<p align="center">
+  <img src="assets/preview.svg" alt="claude-telemetry preview" width="720">
+</p>
 
 ## Installation
 
