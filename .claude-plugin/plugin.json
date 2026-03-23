@@ -1,0 +1,5 @@
+{
+  "name": "claude-telemetry",
+  "version": "1.0.0",
+  "description": "Customizable 2-line status line for Claude Code — real-time session telemetry in your terminal"
+}
