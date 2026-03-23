@@ -131,7 +131,12 @@ def dw:
 
 # ── Detect user type: OAuth (has rate_limits) vs API key ──
 . as $d |
-($d.rate_limits != null) as $is_oauth |
+(($cfg.user_type // "auto") |
+  if . == "oauth" then true
+  elif . == "api" then false
+  else $d.rate_limits != null
+  end
+) as $is_oauth |
 
 # ══════════════════════════════════════════
 # LINE 1: Model │ Elapsed │ Git

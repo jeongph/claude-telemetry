@@ -15,5 +15,6 @@
   "colors": true,
   "bar_width": 5,
   "separator": " \u2502 ",
-  "language": "en"
+  "language": "en",
+  "user_type": "auto"
 }
