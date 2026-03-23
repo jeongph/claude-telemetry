@@ -105,10 +105,11 @@ def bar:
   D + ([range($e)] | map("\u25b1") | join("")) + R;
 
 def fmt_dur:
+  def n: c("0;37");  # reset + white (clears dim)
   (. / 1000 | floor) |
-  if . >= 3600 then wht + "\(. / 3600 | floor)" + D + "h " + wht + "\(. % 3600 / 60 | floor)" + D + "m"
-  elif . >= 60 then wht + "\(. / 60 | floor)" + D + "m " + wht + "\(. % 60)" + D + "s"
-  else wht + "\(.)" + D + "s"
+  if . >= 3600 then n + "\(. / 3600 | floor)" + D + "h " + n + "\(. % 3600 / 60 | floor)" + D + "m"
+  elif . >= 60 then n + "\(. / 60 | floor)" + D + "m " + n + "\(. % 60)" + D + "s"
+  else n + "\(.)" + D + "s"
   end + R;
 
 def fmt_remaining:
