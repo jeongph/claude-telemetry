@@ -25,7 +25,7 @@ Customizable multi-line status line for [Claude Code](https://claude.com/claude-
 3. Run interactive setup:
 
 ```
-/setup
+/claude-telemetry:setup
 ```
 
 ### Manual setup
@@ -58,7 +58,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 4. Run interactive setup:
 
 ```
-/setup
+/claude-telemetry:setup
 ```
 
 5. Restart Claude Code
@@ -95,7 +95,7 @@ Lines 2 and 3 appear only when there is data to display.
 
 ## Setup
 
-Run `/setup` in Claude Code for interactive configuration — it detects your language and walks you through section selection and style preferences.
+Run `/claude-telemetry:setup` in Claude Code for interactive configuration — it detects your language and walks you through section selection and style preferences.
 
 Or edit `~/.claude/statusline/config.json` directly:
 
