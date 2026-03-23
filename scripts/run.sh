@@ -34,9 +34,12 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // .workspace.current_dir // "."' 2>/dev/null)
 GIT_BRANCH=""
 GIT_ADD=0
 GIT_DEL=0
+GIT_AHEAD=0
+GIT_BEHIND=0
 if git -C "$CWD" rev-parse --is-inside-work-tree &>/dev/null; then
   GIT_BRANCH=$(git -C "$CWD" rev-parse --abbrev-ref HEAD 2>/dev/null)
   read -r GIT_ADD GIT_DEL <<< "$({ git -C "$CWD" diff --numstat 2>/dev/null; git -C "$CWD" diff --cached --numstat 2>/dev/null; } | awk '{a+=$1; d+=$2} END {print a+0, d+0}')"
+  read -r GIT_AHEAD GIT_BEHIND <<< "$(git -C "$CWD" rev-list --left-right --count HEAD...@{u} 2>/dev/null || echo "0 0")"
 fi
 
 echo "$INPUT" | jq -r \
@@ -46,6 +49,8 @@ echo "$INPUT" | jq -r \
   --arg git_branch "$GIT_BRANCH" \
   --argjson git_add "${GIT_ADD:-0}" \
   --argjson git_del "${GIT_DEL:-0}" \
+  --argjson git_ahead "${GIT_AHEAD:-0}" \
+  --argjson git_behind "${GIT_BEHIND:-0}" \
 '
 
 # ── Config ──
@@ -132,9 +137,14 @@ def dw:
    ($d.model.display_name // null) |
    if . then cyn + . + R else empty end,
 
-   # Git branch + diff
+   # Git branch + sync + diff
    (if on("git") and $git_branch != "" then
      mag + $git_branch + R +
+     (if $git_ahead > 0 or $git_behind > 0 then
+       " " +
+       (if $git_ahead > 0 then ylw + "\u2191\($git_ahead)" + R else "" end) +
+       (if $git_behind > 0 then cyn + "\u2193\($git_behind)" + R else "" end)
+     else "" end) +
      (if $git_add > 0 or $git_del > 0 then
        " " + grn + "+\($git_add)" + R + D + "/" + R + red + "-\($git_del)" + R
      else "" end)
