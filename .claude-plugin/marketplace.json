@@ -1,0 +1,15 @@
+{
+  "name": "jeongph-claude-telemetry",
+  "owner": {
+    "name": "JeongUk Park",
+    "email": "jeongph.dev@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "claude-telemetry",
+      "source": ".",
+      "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
+      "version": "1.0.0"
+    }
+  ]
+}

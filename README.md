@@ -3,14 +3,14 @@
 Customizable multi-line status line for [Claude Code](https://claude.com/claude-code).
 
 ```
-Opus │ main +3/-1
+Opus │ main ↑1 +3/-1
 ◷ Elapsed 12m34s │ ◆ Context ▰▰▱▱▱ 35% (1M) │ 5h ▰▱▱▱▱ 24%  7d ▰▰▰▰▱ 71%
 ```
 
 ## Features
 
 - **Multi-line layout** — identity & git on top, session metrics below
-- **Git integration** — branch name + uncommitted changes (+/-)
+- **Git integration** — branch, ahead/behind (↑↓), uncommitted changes (+/-)
 - **Color-coded thresholds** — green/yellow/red for context, rate limits, cost
 - **Progress bars** — ▰▱ visualization for usage percentages
 - **Adaptive width** — auto-drops lower priority sections on narrow terminals
@@ -22,7 +22,7 @@ Opus │ main +3/-1
 | Line | Section | Description |
 |------|---------|-------------|
 | 1 | Model | Current model name |
-| 1 | Git | Branch + changes (+/-) |
+| 1 | Git | Branch + ↑push/↓pull + changes (+/-) |
 | 1 | Agent | Active agent name |
 | 1 | Vim | Vim mode indicator |
 | 2 | Elapsed | Session duration |
@@ -34,36 +34,49 @@ Opus │ main +3/-1
 
 ## Installation
 
-### As Claude Code plugin (recommended)
+### Via marketplace (recommended)
 
 ```bash
-# Clone the repo
-git clone https://github.com/jeongph/claude-telemetry.git
+# 1. Add marketplace
+/plugin marketplace add jeongph/claude-telemetry
 
-# Register as plugin in Claude Code
-# (plugin installation via marketplace coming soon)
+# 2. Install
+/plugin install claude-telemetry@jeongph-claude-telemetry
 ```
 
 ### Manual setup
 
-1. Copy `scripts/run.sh` to your preferred location
-2. Copy `config.example.json` to `~/.claude/statusline/config.json`
+1. Clone the repo:
+
+```bash
+git clone https://github.com/jeongph/claude-telemetry.git
+```
+
+2. Copy the example config:
+
+```bash
+mkdir -p ~/.claude/statusline
+cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
+```
+
 3. Add to `~/.claude/settings.json`:
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "bash /path/to/scripts/run.sh"
+    "command": "bash /path/to/claude-telemetry/scripts/run.sh"
   }
 }
 ```
 
 4. Restart Claude Code
 
-## Configuration
+## Setup
 
-Run `/setup` in Claude Code for interactive configuration, or edit `~/.claude/statusline/config.json` directly:
+Run `/setup` in Claude Code for interactive configuration — it detects your language and walks you through section selection and style preferences.
+
+Or edit `~/.claude/statusline/config.json` directly:
 
 ```json
 {
