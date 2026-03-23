@@ -110,6 +110,14 @@ def fmt_dur:
   elif . >= 60 then "\(. / 60 | floor)m\(. % 60)s"
   else "\(.)s" end;
 
+def fmt_remaining:
+  (. - now | floor) |
+  if . <= 0 then null
+  elif . >= 86400 then "\(. / 86400 | floor)d\(. % 86400 / 3600 | floor)h"
+  elif . >= 3600 then "\(. / 3600 | floor)h\(. % 3600 / 60 | floor)m"
+  elif . >= 60 then "\(. / 60 | floor)m"
+  else "\(.)s" end;
+
 def fmt_cost:
   . * 100 | round | . / 100 | tostring |
   if test("[.]") then split(".") | "\(.[0]).\(.[1] + "00" | .[:2])"
@@ -154,8 +162,12 @@ def dw:
      else empty end
    else empty end),
 
-   # Git branch + sync + diff
+   # Folder:branch + sync + diff
    (if on("git") and $git_branch != "" then
+     (($d.workspace.project_dir // $d.cwd // null) |
+       if . then split("/") | last else null end
+     ) as $folder |
+     (if $folder then wht + $folder + D + ":" + R else "" end) +
      mag + $git_branch + R +
      (if $git_ahead > 0 or $git_behind > 0 then
        " " +
@@ -165,7 +177,12 @@ def dw:
      (if $git_add > 0 or $git_del > 0 then
        " " + grn + "+\($git_add)" + R + D + "/" + R + red + "-\($git_del)" + R
      else "" end)
-   else empty end)
+   else
+     # No git — show folder name only
+     (($d.workspace.project_dir // $d.cwd // null) |
+       if . then split("/") | last else null end
+     ) | if . then wht + . + R else empty end
+   end)
 
  ] | join(sep)
 ) as $line1 |
@@ -188,14 +205,22 @@ def dw:
       else "" end))}
   else empty end),
 
-  # OAuth: show rate limits
+  # OAuth: show rate limits with reset countdown
   (if $is_oauth and on("rate_limits") then
     [
-      (($d.rate_limits.five_hour.used_percentage // null) |
-        if . then D + "5h " + R + (. | bar) + " " + (. | tc) + "\(round)%" + R
+      ($d.rate_limits.five_hour // null |
+        if . then
+          (.used_percentage // 0) as $pct |
+          (.resets_at // null | if . then fmt_remaining else null end) as $reset |
+          D + "5h " + R + ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R +
+          (if $reset then D + " \u21bb" + $reset + R else "" end)
         else empty end),
-      (($d.rate_limits.seven_day.used_percentage // null) |
-        if . then D + "7d " + R + (. | bar) + " " + (. | tc) + "\(round)%" + R
+      ($d.rate_limits.seven_day // null |
+        if . then
+          (.used_percentage // 0) as $pct |
+          (.resets_at // null | if . then fmt_remaining else null end) as $reset |
+          D + "7d " + R + ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R +
+          (if $reset then D + " \u21bb" + $reset + R else "" end)
         else empty end)
     ] | if length > 0 then {ord:2, pri:2, txt: (join("  "))} else empty end
   else empty end),
