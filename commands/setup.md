@@ -69,15 +69,15 @@ Based on user choices, write `~/.claude/statusline/config.json`:
 ## Step 5: Configure statusLine in settings.json
 
 Check if `~/.claude/settings.json` already has a `statusLine` entry.
-- If not present: add it pointing to `bash ~/.claude/statusline/run.sh`
+- If not present: add it pointing to the run.sh script
 - If already present and pointing to the same script: leave it
 - If pointing to something else: ask the user if they want to replace it
 
-The statusLine config should be:
+Find the actual path to `run.sh` by resolving `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh` or searching for the installed plugin location. The statusLine config should be:
 ```json
 "statusLine": {
   "type": "command",
-  "command": "bash /home/jeonguk/.claude/statusline/run.sh"
+  "command": "bash <resolved-path-to>/scripts/run.sh"
 }
 ```
 
