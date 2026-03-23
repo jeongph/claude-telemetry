@@ -176,17 +176,16 @@ def dw:
 
 ([
   (if on("context") then
-    ($d.context_window.used_percentage // null) as $pct |
+    ($d.context_window.used_percentage // 0) as $pct |
     ($d.context_window.context_window_size // null) as $sz |
-    if $pct and $sz then
-      ($d.exceeds_200k_tokens == true) as $over |
-      {ord:1, pri:1, txt: (
-        cyn + "\u25c6 " + D + l("ctx") + " " + R +
-        ($pct | bar) + " " +
-        ($pct | tc) + "\($pct | round)%" + R +
-        (if $over then c("1;33") else D end) +
-        " (\($sz | fmt_k))" + R)}
-    else empty end
+    ($d.exceeds_200k_tokens == true) as $over |
+    {ord:1, pri:1, txt: (
+      cyn + "\u25c6 " + D + l("ctx") + " " + R +
+      ($pct | bar) + " " +
+      ($pct | tc) + "\($pct | round)%" + R +
+      (if $sz then
+        (if $over then c("1;33") else D end) + " (\($sz | fmt_k))" + R
+      else "" end))}
   else empty end),
 
   # OAuth: show rate limits
