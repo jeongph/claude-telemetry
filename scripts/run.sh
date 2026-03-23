@@ -113,8 +113,8 @@ def fmt_dur:
 def fmt_remaining:
   (. - now | floor) |
   if . <= 0 then null
-  elif . >= 86400 then "\(. / 86400 | floor)d\(. % 86400 / 3600 | floor)h"
-  elif . >= 3600 then "\(. / 3600 | floor)h\(. % 3600 / 60 | floor)m"
+  elif . >= 86400 then "\(. / 86400 | floor)d"
+  elif . >= 3600 then "\(. / 3600 | floor)h"
   elif . >= 60 then "\(. / 60 | floor)m"
   else "\(.)s" end;
 
@@ -212,14 +212,14 @@ def dw:
         if . then
           (.used_percentage // 0) as $pct |
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
-          D + (if $reset then $reset + "/" else "" end) + "5h " + R +
+          (if $reset then wht + $reset + D + "/5h " + R else D + "5h " + R end) +
           ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R
         else empty end),
       ($d.rate_limits.seven_day // null |
         if . then
           (.used_percentage // 0) as $pct |
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
-          D + (if $reset then $reset + "/" else "" end) + "7d " + R +
+          (if $reset then wht + $reset + D + "/7d " + R else D + "7d " + R end) +
           ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R
         else empty end)
     ] | if length > 0 then {ord:2, pri:2, txt: (join("  "))} else empty end
