@@ -235,17 +235,17 @@ def dw:
     [
       ($d.rate_limits.five_hour // null |
         if . then
-          (.used_percentage // 0) as $pct |
+          (100 - (.used_percentage // 0)) as $rem |
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
           (if $reset then $reset + D + "/5h " + R else D + "5h " + R end) +
-          ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R
+          ($rem | bar_rem) + " " + ($rem | tc_rem) + "\($rem | round)%" + R
         else empty end),
       ($d.rate_limits.seven_day // null |
         if . then
-          (.used_percentage // 0) as $pct |
+          (100 - (.used_percentage // 0)) as $rem |
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
           (if $reset then $reset + D + "/7d " + R else D + "7d " + R end) +
-          ($pct | bar) + " " + ($pct | tc) + "\($pct | round)%" + R
+          ($rem | bar_rem) + " " + ($rem | tc_rem) + "\($rem | round)%" + R
         else empty end)
     ] | if length > 0 then {ord:2, pri:2, txt: (join("  "))} else empty end
   else empty end),
