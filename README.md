@@ -22,6 +22,12 @@ Customizable multi-line status line for [Claude Code](https://claude.com/claude-
 /plugin install claude-telemetry@jeongph-claude-telemetry
 ```
 
+3. Run interactive setup:
+
+```
+/setup
+```
+
 ### Manual setup
 
 1. Clone the repo:
@@ -49,7 +55,13 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 }
 ```
 
-4. Restart Claude Code
+4. Run interactive setup:
+
+```
+/setup
+```
+
+5. Restart Claude Code
 
 ## Features
 
