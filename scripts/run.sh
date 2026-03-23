@@ -106,9 +106,10 @@ def bar:
 
 def fmt_dur:
   (. / 1000 | floor) |
-  if . >= 3600 then "\(. / 3600 | floor)h\(. % 3600 / 60 | floor)m"
-  elif . >= 60 then "\(. / 60 | floor)m\(. % 60)s"
-  else "\(.)s" end;
+  if . >= 3600 then wht + "\(. / 3600 | floor)" + D + "h " + wht + "\(. % 3600 / 60 | floor)" + D + "m"
+  elif . >= 60 then wht + "\(. / 60 | floor)" + D + "m " + wht + "\(. % 60)" + D + "s"
+  else wht + "\(.)" + D + "s"
+  end + R;
 
 def fmt_remaining:
   (. - now | floor) |
@@ -158,7 +159,7 @@ def dw:
    (if on("duration") then
      ($d.cost.total_duration_ms // null) |
      if . and . > 0 then
-       D + "\u25f7 " + l("dur") + " " + R + wht + fmt_dur + R
+       D + "\u25f7 " + l("dur") + " " + R + fmt_dur
      else empty end
    else empty end),
 
@@ -247,7 +248,7 @@ def dw:
   (if on("api_duration") then
     ($d.cost.total_api_duration_ms // null) |
     if . and . > 0 then
-      {ord:4, pri:8, txt: (D + "\u21bb " + l("api") + " " + R + wht + fmt_dur + R)}
+      {ord:4, pri:8, txt: (D + "\u21bb " + l("api") + " " + R + fmt_dur)}
     else empty end
   else empty end),
 
