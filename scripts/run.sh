@@ -1,7 +1,8 @@
 #!/bin/bash
 # Claude Code custom status line (multi-line layout)
-# Line 1: Model │ Git branch +/-
-# Line 2: Elapsed │ Context │ Rate limits
+# Line 1: Model │ Elapsed │ Git
+# Line 2: Context │ Rate limits (OAuth) or Cost (API key)
+# Line 3: Agent │ Vim (only when active)
 # Config: ~/.claude/statusline/config.json
 
 CFG_DIR="${CLAUDE_STATUSLINE_CONFIG:-$HOME/.claude/statusline}"
@@ -76,19 +77,19 @@ def L:
   if $lang == "ko" then
     { "ctx":"\ucee8\ud14d\uc2a4\ud2b8", "dur":"\uacbd\uacfc",
       "api":"API \ub300\uae30", "in":"\uc785\ub825", "out":"\ucd9c\ub825",
-      "warn":">200k \ucd08\uacfc", "cost":"\ube44\uc6a9" }
+      "cost":"\ube44\uc6a9" }
   elif $lang == "ja" then
     { "ctx":"\u30b3\u30f3\u30c6\u30ad\u30b9\u30c8", "dur":"\u7d4c\u904e",
       "api":"API\u5f85\u6a5f", "in":"\u5165\u529b", "out":"\u51fa\u529b",
-      "warn":">200k\u8d85\u904e", "cost":"\u8cbb\u7528" }
+      "cost":"\u8cbb\u7528" }
   elif $lang == "zh" then
     { "ctx":"\u4e0a\u4e0b\u6587", "dur":"\u5df2\u7528",
       "api":"API\u7b49\u5f85", "in":"\u8f93\u5165", "out":"\u8f93\u51fa",
-      "warn":">200k\u8d85\u9650", "cost":"\u8d39\u7528" }
+      "cost":"\u8d39\u7528" }
   else
     { "ctx":"Context", "dur":"Elapsed",
       "api":"API", "in":"In", "out":"Out",
-      "warn":">200k", "cost":"Cost" }
+      "cost":"Cost" }
   end;
 def l(k): L[k] // k;
 
@@ -128,10 +129,13 @@ def dw:
     else 1 end
   ) | add // 0;
 
-# ══════════════════════════════════════════
-# LINE 1: Model │ Git branch ±changes
-# ══════════════════════════════════════════
+# ── Detect user type: OAuth (has rate_limits) vs API key ──
 . as $d |
+($d.rate_limits != null) as $is_oauth |
+
+# ══════════════════════════════════════════
+# LINE 1: Model │ Elapsed │ Git
+# ══════════════════════════════════════════
 
 ([ # Model
    ($d.model.display_name // null) |
@@ -156,27 +160,13 @@ def dw:
      (if $git_add > 0 or $git_del > 0 then
        " " + grn + "+\($git_add)" + R + D + "/" + R + red + "-\($git_del)" + R
      else "" end)
-   else empty end),
-
-   # Agent (if active)
-   (if on("agent") then
-     ($d.agent.name // null) |
-     if . then D + "\u25b6 " + R + mag + . + R else empty end
-   else empty end),
-
-   # Vim mode
-   (if on("vim_mode") then
-     ($d.vim.mode // null) |
-     if . then
-       (if . == "NORMAL" then cyn elif . == "INSERT" then grn else wht end) + . + R
-     else empty end
    else empty end)
 
  ] | join(sep)
 ) as $line1 |
 
 # ══════════════════════════════════════════
-# LINE 2: Context │ Rate limits
+# LINE 2: Context │ Rate limits / Cost
 # ══════════════════════════════════════════
 
 ([
@@ -194,7 +184,8 @@ def dw:
     else empty end
   else empty end),
 
-  (if on("rate_limits") then
+  # OAuth: show rate limits
+  (if $is_oauth and on("rate_limits") then
     [
       (($d.rate_limits.five_hour.used_percentage // null) |
         if . then D + "5h " + R + (. | bar) + " " + (. | tc) + "\(round)%" + R
@@ -205,6 +196,17 @@ def dw:
     ] | if length > 0 then {ord:2, pri:2, txt: (join("  "))} else empty end
   else empty end),
 
+  # API key: auto-show cost (replaces rate limits)
+  (if ($is_oauth | not) then
+    ($d.cost.total_cost_usd // null) |
+    if . and . > 0 then
+      {ord:2, pri:2, txt: (
+        D + l("cost") + " " + R +
+        (if . >= 5 then red elif . >= 1 then ylw else grn end) +
+        "$" + fmt_cost + R)}
+    else empty end
+  else empty end),
+
   (if on("lines") then
     ($d.cost.total_lines_added // null) as $a |
     ($d.cost.total_lines_removed // null) as $r |
@@ -213,20 +215,10 @@ def dw:
     else empty end
   else empty end),
 
-  (if on("cost") then
-    ($d.cost.total_cost_usd // null) |
-    if . and . > 0 then
-      {ord:4, pri:6, txt: (
-        D + l("cost") + " " + R +
-        (if . >= 5 then red elif . >= 1 then ylw else grn end) +
-        "$" + fmt_cost + R)}
-    else empty end
-  else empty end),
-
   (if on("api_duration") then
     ($d.cost.total_api_duration_ms // null) |
     if . and . > 0 then
-      {ord:7, pri:9, txt: (D + "\u21bb " + l("api") + " " + R + wht + fmt_dur + R)}
+      {ord:4, pri:8, txt: (D + "\u21bb " + l("api") + " " + R + wht + fmt_dur + R)}
     else empty end
   else empty end),
 
@@ -234,14 +226,13 @@ def dw:
     ($d.context_window.total_input_tokens // null) as $ti |
     ($d.context_window.total_output_tokens // null) as $to |
     if $ti then
-      {ord:8, pri:10, txt: (
+      {ord:5, pri:9, txt: (
         D + l("in") + " " + R + wht + ($ti | fmt_k) + R +
         D + " " + l("out") + " " + R + wht + ($to // 0 | fmt_k) + R)}
     else empty end
   else empty end)
 
 ] |
-  # Fit to terminal width by priority
   sort_by(.pri) |
   (sep | dw) as $sw |
   reduce .[] as $s (
@@ -255,8 +246,29 @@ def dw:
   .sel | sort_by(.ord) | map(.txt) | join(sep)
 ) as $line2 |
 
+# ══════════════════════════════════════════
+# LINE 3: Agent │ Vim (only when active)
+# ══════════════════════════════════════════
+
+([
+  (if on("agent") then
+    ($d.agent.name // null) |
+    if . then D + "\u25b6 " + R + mag + . + R else empty end
+  else empty end),
+
+  (if on("vim_mode") then
+    ($d.vim.mode // null) |
+    if . then
+      (if . == "NORMAL" then cyn elif . == "INSERT" then grn else wht end) + . + R
+    else empty end
+  else empty end)
+
+] | map(select(. != null and . != "")) | join(sep)
+) as $line3 |
+
 # ── Output ──
-if $line2 == "" then $line1
-else $line1 + "\n" + $line2
-end
+[ $line1,
+  (if $line2 != "" then $line2 else empty end),
+  (if $line3 != "" then $line3 else empty end)
+] | join("\n")
 '
