@@ -1,94 +1,230 @@
 ---
 description: Interactive setup for Claude Code status line
-allowed-tools: [Bash, Read, Write, AskUserQuestion]
+allowed-tools: [Bash, Read, Write, Edit, AskUserQuestion]
 ---
 
 # Status Line Interactive Setup
 
-You are helping the user configure their Claude Code status line at `~/.claude/statusline/`.
+You are helping the user configure their Claude Code status line.
+
+## Execution Flow
+
+Execute steps 1 → 2 → 3 → 4 → 5 → 6 sequentially. Do NOT skip steps. Do NOT combine steps.
+
+---
 
 ## Step 1: Detect Language
 
-Read `~/.claude/settings.json` and check the `language` field. Use that language for ALL communication in this setup. If "한국어" → Korean, if "English" → English, etc. Default to English.
+1. Read `~/.claude/settings.json`
+2. Check the `language` field
+3. Map: `"한국어"` → ko, `"English"` → en, `"日本語"` → ja, `"中文"` → zh. Default: en
+4. Use this language for ALL user-facing text in the remaining steps
 
-## Step 2: Present Sections
+---
 
-Present the following sections as a numbered list. Mark recommended items. Include a short description of what each section shows. The model name section is always shown and not configurable.
+## Step 2: Section Selection
 
-| Key | Icon | Name (en) | Name (ko) | Description (en) | Description (ko) | Default |
-|-----|------|-----------|-----------|-------------------|-------------------|---------|
-| context | ◆ | Context | 컨텍스트 | Remaining context window % with bar (turns yellow when >200k) | 컨텍스트 윈도우 잔여량 (프로그레스 바, 200k 초과 시 경고색) | ON |
-| rate_limits | | Rate Limits | Rate Limits | Remaining 5h / 7d % with reset countdown | 5시간/7일 잔여량 + 리셋 카운트다운 | ON |
-| duration | ◷ | Elapsed | 경과 시간 | Session elapsed time | 세션 경과 시간 | ON |
-| git | | Git | Git | folder:branch, sync, changes, untracked, stash, worktrees | 폴더:브랜치, 동기화, 변경, untracked, stash, worktree | ON |
-| lines | | Code Changes | 코드 변경 | Lines added/removed in session | 세션 중 추가/삭제된 코드 라인 | OFF |
-| cost | | Cost | 비용 | Session cost in USD (API key users only, auto-detected) | 세션 비용 - USD (API 키 사용자 전용, 자동 감지) | OFF |
-| api_duration | ↻ | API Duration | API 대기 | Time spent waiting for API responses | API 응답 대기 시간 합계 | OFF |
-| tokens | | Token Details | 토큰 상세 | Input/output token counts | 입출력 토큰 수 상세 | OFF |
-| agent | ▶ | Agent | 에이전트 | Agent name (shown only when active) | 에이전트 이름 (활성 시에만 표시) | ON |
-| vim_mode | | Vim Mode | Vim 모드 | Current vim mode (shown only when enabled) | 현재 Vim 모드 (활성 시에만 표시) | ON |
+Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions to detected language):
 
-Ask the user to select which sections to enable. Suggest they can just press Enter to accept the recommended defaults, or type numbers to customize.
+```json
+{
+  "questions": [{
+    "question": "<translated: Which sections would you like to enable?>",
+    "header": "Sections",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "<translated: Recommended defaults>",
+        "description": "◆ Context, Rate Limits, ◷ Elapsed, Git, ▶ Agent, Vim Mode"
+      },
+      {
+        "label": "<translated: All ON>",
+        "description": "<translated: Enable all 10 sections>"
+      },
+      {
+        "label": "<translated: Minimal>",
+        "description": "<translated: Context + Rate Limits only>"
+      },
+      {
+        "label": "<translated: Custom>",
+        "description": "<translated: Choose each section individually>"
+      }
+    ]
+  }]
+}
+```
+
+**If user selects "Custom"**, call AskUserQuestion again with multiSelect:
+
+```json
+{
+  "questions": [{
+    "question": "<translated: Select sections to enable (model name is always shown)>",
+    "header": "Sections",
+    "multiSelect": true,
+    "options": [
+      {"label": "◆ Context", "description": "<translated: Remaining context window % with progress bar>"},
+      {"label": "Rate Limits", "description": "<translated: 5h/7d remaining % with reset countdown>"},
+      {"label": "◷ Elapsed", "description": "<translated: Session elapsed time>"},
+      {"label": "Git", "description": "<translated: folder:branch, sync, changes, untracked, stash, worktree>"}
+    ]
+  }]
+}
+```
+
+Then a second AskUserQuestion for the remaining sections:
+
+```json
+{
+  "questions": [{
+    "question": "<translated: Select additional sections to enable>",
+    "header": "Additional",
+    "multiSelect": true,
+    "options": [
+      {"label": "Code Changes", "description": "<translated: Lines added/removed in session>"},
+      {"label": "Cost", "description": "<translated: Session cost in USD (API key users only)>"},
+      {"label": "↻ API Duration", "description": "<translated: Time spent waiting for API responses>"},
+      {"label": "Token Details", "description": "<translated: Input/output token counts>"}
+    ]
+  }]
+}
+```
+
+Note: Agent and Vim Mode are always ON in Custom mode (they only appear when active, no downside).
+
+### Section key mapping
+
+| Option label | Config key |
+|---|---|
+| ◆ Context | context |
+| Rate Limits | rate_limits |
+| ◷ Elapsed | duration |
+| Git | git |
+| Code Changes | lines |
+| Cost | cost |
+| ↻ API Duration | api_duration |
+| Token Details | tokens |
+
+### Preset mappings
+
+| Preset | ON | OFF |
+|--------|----|----|
+| Recommended | context, rate_limits, duration, git, agent, vim_mode | lines, cost, api_duration, tokens |
+| All ON | ALL sections | (none) |
+| Minimal | context, rate_limits, agent, vim_mode | duration, git, lines, cost, api_duration, tokens |
+
+---
 
 ## Step 3: Style Preferences
 
-After section selection, ask about style in a single question:
+Call AskUserQuestion with EXACTLY this structure:
 
-1. **Progress bar width** (3-10, default: 5)
-2. **Colors** (on/off, default: on)
-3. **Display language** for labels (auto/en/ko/ja/zh, default: en)
+```json
+{
+  "questions": [{
+    "question": "<translated: Choose your style preferences>",
+    "header": "Style",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "<translated: Defaults>",
+        "description": "<translated: Bar width: 5, Colors: ON, Labels: en>"
+      },
+      {
+        "label": "<translated: Localized labels>",
+        "description": "<translated: Bar width: 5, Colors: ON, Labels: (detected language)>"
+      },
+      {
+        "label": "<translated: Compact>",
+        "description": "<translated: Bar width: 3, Colors: ON, Labels: en>"
+      }
+    ]
+  }]
+}
+```
 
-Again, let them press Enter to accept defaults or customize.
+### Style preset mappings
 
-## Step 4: Apply Configuration
+| Preset | bar_width | colors | language |
+|--------|-----------|--------|----------|
+| Defaults | 5 | true | "en" |
+| Localized | 5 | true | (detected language code) |
+| Compact | 3 | true | "en" |
+| (Custom) | user input (3-10) | user input | user input |
 
-Based on user choices, write `~/.claude/statusline/config.json`:
+---
+
+## Step 4: Write Configuration
+
+1. Run `mkdir -p ~/.claude/statusline`
+2. Write `~/.claude/statusline/config.json` with the following structure:
 
 ```json
 {
   "sections": {
-    "git": true/false,
-    "context": true/false,
-    "rate_limits": true/false,
-    "duration": true/false,
-    "lines": true/false,
-    "cost": true/false,
-    "api_duration": true/false,
-    "tokens": true/false,
-    "agent": true/false,
-    "vim_mode": true/false
+    "git": <bool>,
+    "context": <bool>,
+    "rate_limits": <bool>,
+    "duration": <bool>,
+    "lines": <bool>,
+    "cost": <bool>,
+    "api_duration": <bool>,
+    "tokens": <bool>,
+    "agent": <bool>,
+    "vim_mode": <bool>
   },
-  "colors": true/false,
-  "bar_width": N,
-  "separator": " \u2502 ",
-  "language": "xx",
+  "colors": <bool>,
+  "bar_width": <int>,
+  "separator": " │ ",
+  "language": "<lang_code>",
   "user_type": "auto"
 }
 ```
 
+---
+
 ## Step 5: Configure statusLine in settings.json
 
-Check if `~/.claude/settings.json` already has a `statusLine` entry.
-- If not present: add it pointing to the run.sh script
-- If already present and pointing to the same script: leave it
-- If pointing to something else: ask the user if they want to replace it
-
-Find the actual path to `run.sh` by resolving `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh` or searching for the installed plugin location. The statusLine config should be:
+1. Resolve the script path: `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh`
+2. Read `~/.claude/settings.json`
+3. Check the `statusLine` field:
+   - **Not present** → add it
+   - **Present and same script** → skip (tell user it's already configured)
+   - **Present but different** → ask user with AskUserQuestion whether to replace
+4. The statusLine entry must be:
 ```json
 "statusLine": {
   "type": "command",
-  "command": "bash <resolved-path-to>/scripts/run.sh"
+  "command": "bash <resolved-absolute-path>/scripts/run.sh"
 }
 ```
 
-## Step 6: Preview & Confirm
+---
 
-After applying, show a text preview of what the status line will look like with their selections. Use a sample scenario with realistic values. Tell them to restart Claude Code to see it live.
+## Step 6: Preview & Done
+
+Output a preview using this EXACT template (substitute values based on user selections):
+
+```
+📋 설정 완료! 미리보기:
+
+Line 1: Opus 4.6 │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2
+Line 2: ◆ Context ▰▰▰▱▱ 55% (200k) │ 3h 45m/5h ▰▰▰▰▱ 70%  6d 12h/7d ▰▰▰▰▰ 94%
+Line 3: ▶ code-explorer
+
+Claude Code를 재시작하면 적용됩니다.
+```
+
+- Only show sections the user enabled
+- Adjust bar width to match user's choice
+- Translate the message to detected language
+
+---
 
 ## Rules
 
-- Be concise and friendly
-- Use the detected language consistently throughout
-- Use AskUserQuestion for each interactive step
-- Do NOT explain implementation details unless asked
-- The script at `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh` already exists - do not modify it, only configure it
+- Be concise — no explanations unless asked
+- Use detected language consistently
+- Follow AskUserQuestion structures EXACTLY as specified above
+- Do NOT modify `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh`
+- Do NOT output text between AskUserQuestion calls except brief transitions
