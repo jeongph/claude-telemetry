@@ -7,7 +7,11 @@
   "plugins": [
     {
       "name": "claude-telemetry",
-      "source": ".",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/jeongph/claude-telemetry.git",
+        "sha": "d20b514b4fa7eab29f16443fcfe2de6c378e9e83"
+      },
       "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
       "version": "1.0.0"
     }
