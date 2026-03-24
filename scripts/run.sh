@@ -45,6 +45,8 @@ if git -C "$CWD" rev-parse --is-inside-work-tree &>/dev/null; then
   read -r GIT_AHEAD GIT_BEHIND <<< "$(git -C "$CWD" rev-list --left-right --count HEAD...@{u} 2>/dev/null || echo "0 0")"
   GIT_UNTRACKED=$(git -C "$CWD" ls-files --others --exclude-standard 2>/dev/null | wc -l)
   GIT_STASH=$(git -C "$CWD" stash list 2>/dev/null | wc -l)
+  GIT_WORKTREES=$(( $(git -C "$CWD" worktree list 2>/dev/null | wc -l) - 1 ))
+  [ "$GIT_WORKTREES" -lt 0 ] && GIT_WORKTREES=0
 fi
 
 echo "$INPUT" | jq -r \
@@ -58,6 +60,7 @@ echo "$INPUT" | jq -r \
   --argjson git_behind "${GIT_BEHIND:-0}" \
   --argjson git_untracked "${GIT_UNTRACKED:-0}" \
   --argjson git_stash "${GIT_STASH:-0}" \
+  --argjson git_worktrees "${GIT_WORKTREES:-0}" \
 '
 
 # ── Config ──
@@ -201,7 +204,8 @@ def dw:
        " " + grn + "+\($git_add)" + R + D + "/" + R + red + "-\($git_del)" + R
      else "" end) +
      (if $git_untracked > 0 then D + " ?" + R + ylw + "\($git_untracked)" + R else "" end) +
-     (if $git_stash > 0 then D + " \u2261" + R + mag + "\($git_stash)" + R else "" end)
+     (if $git_stash > 0 then D + " \u2261" + R + mag + "\($git_stash)" + R else "" end) +
+     (if $git_worktrees > 0 then D + " \u2387" + R + cyn + "\($git_worktrees)" + R else "" end)
    else
      # No git — show folder name only
      (($d.cwd // $d.workspace.project_dir // null) |
