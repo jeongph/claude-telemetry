@@ -9,7 +9,7 @@ You are helping the user configure their Claude Code status line.
 
 ## Execution Flow
 
-Execute steps 1 → 2 → 3 → 4 → 5 → 6 sequentially. Do NOT skip steps. Do NOT combine steps.
+Execute steps 1 → 2 → 3 → 4 → 5 → 6 → 7 sequentially. Do NOT skip steps. Do NOT combine steps.
 
 ---
 
@@ -22,7 +22,46 @@ Execute steps 1 → 2 → 3 → 4 → 5 → 6 sequentially. Do NOT skip steps. D
 
 ---
 
-## Step 2: Section Selection
+## Step 2: Download Go Binary
+
+1. Detect OS:
+   ```bash
+   uname -s
+   ```
+   Map: `Linux` → `linux`, `Darwin` → `darwin`
+
+2. Detect architecture:
+   ```bash
+   uname -m
+   ```
+   Map: `x86_64` → `amd64`, `aarch64` → `arm64`, `arm64` → `arm64`
+
+3. Create the binary directory:
+   ```bash
+   mkdir -p ~/.claude/statusline/bin
+   ```
+
+4. Download the binary from GitHub Releases:
+   ```bash
+   curl -fsSL "https://github.com/jeongph/claude-telemetry/releases/latest/download/claude-telemetry-{os}-{arch}" \
+     -o ~/.claude/statusline/bin/claude-telemetry
+   ```
+   (Replace `{os}` and `{arch}` with the detected values.)
+
+5. Make it executable:
+   ```bash
+   chmod +x ~/.claude/statusline/bin/claude-telemetry
+   ```
+
+6. Verify the binary works:
+   ```bash
+   ~/.claude/statusline/bin/claude-telemetry --version
+   ```
+   If this fails, inform the user and stop.
+
+---
+
+## Step 3: Section Selection
 
 Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions to detected language):
 
@@ -107,15 +146,16 @@ Note: Agent and Vim Mode are always ON in Custom mode (they only appear when act
 
 ### Preset mappings
 
-| Preset | ON | OFF |
-|--------|----|----|
-| Recommended | context, rate_limits, duration, git, agent, vim_mode | lines, cost, api_duration, tokens |
-| All ON | ALL sections | (none) |
-| Minimal | context, rate_limits, agent, vim_mode | duration, git, lines, cost, api_duration, tokens |
+| Preset | preset value | ON | OFF |
+|--------|-------------|----|-----|
+| Recommended | `"recommended"` | context, rate_limits, duration, git, agent, vim_mode | lines, cost, api_duration, tokens |
+| All ON | `"all"` | ALL sections | (none) |
+| Minimal | `"minimal"` | context, rate_limits, agent, vim_mode | duration, git, lines, cost, api_duration, tokens |
+| Custom | `"custom"` | (user selection) | (user selection) |
 
 ---
 
-## Step 3: Style Preferences
+## Step 4: Style Preferences
 
 Call AskUserQuestion with EXACTLY this structure:
 
@@ -154,13 +194,14 @@ Call AskUserQuestion with EXACTLY this structure:
 
 ---
 
-## Step 4: Write Configuration
+## Step 5: Write Configuration
 
 1. Run `mkdir -p ~/.claude/statusline`
 2. Write `~/.claude/statusline/config.json` with the following structure:
 
 ```json
 {
+  "preset": "<preset_value>",
   "sections": {
     "git": <bool>,
     "context": <bool>,
@@ -173,6 +214,12 @@ Call AskUserQuestion with EXACTLY this structure:
     "agent": <bool>,
     "vim_mode": <bool>
   },
+  "thresholds": {
+    "context_warn": 20,
+    "context_critical": 10,
+    "rate_warn": 20,
+    "rate_critical": 10
+  },
   "colors": <bool>,
   "bar_width": <int>,
   "separator": " │ ",
@@ -181,9 +228,13 @@ Call AskUserQuestion with EXACTLY this structure:
 }
 ```
 
+- Set `preset` to the preset value from Step 3 (`"recommended"`, `"all"`, `"minimal"`, or `"custom"`).
+- For non-custom presets, populate `sections` according to the preset mapping table in Step 3.
+- For the `"custom"` preset, populate `sections` from the user's selections.
+
 ---
 
-## Step 5: Configure statusLine in settings.json
+## Step 6: Configure statusLine in settings.json
 
 1. Resolve the script path: `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh`
 2. Read `~/.claude/settings.json`
@@ -201,7 +252,7 @@ Call AskUserQuestion with EXACTLY this structure:
 
 ---
 
-## Step 6: Preview & Done
+## Step 7: Preview & Done
 
 Output a preview using this EXACT template (substitute values based on user selections):
 

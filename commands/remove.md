@@ -29,17 +29,17 @@ Call AskUserQuestion with EXACTLY this structure (translate to detected language
 ```json
 {
   "questions": [{
-    "question": "<translated: Remove the status line configuration? This will delete config and disable the status line.>",
+    "question": "<translated: Remove the status line configuration? This will delete config, binary, cache, and disable the status line.>",
     "header": "Remove",
     "multiSelect": false,
     "options": [
       {
         "label": "<translated: Remove all>",
-        "description": "<translated: Delete config file and remove statusLine from settings.json>"
+        "description": "<translated: Delete config, binary, cache directory, and remove statusLine from settings.json>"
       },
       {
         "label": "<translated: Config only>",
-        "description": "<translated: Delete config file only, keep statusLine entry in settings.json>"
+        "description": "<translated: Delete config file only, keep binary and statusLine entry in settings.json>"
       },
       {
         "label": "<translated: Cancel>",
@@ -60,22 +60,30 @@ Based on user choice:
 
 ### "Remove all"
 
-1. Delete config directory:
+1. Remove the Go binary:
+   ```bash
+   rm -f ~/.claude/statusline/bin/claude-telemetry
+   ```
+2. Remove the git cache directory:
+   ```bash
+   rm -rf ~/.claude/statusline/cache/
+   ```
+3. Delete the full config directory:
    ```bash
    rm -rf ~/.claude/statusline/
    ```
-2. Read `~/.claude/settings.json`
-3. Remove the `"statusLine"` entry from the JSON using Edit tool
-4. Verify `settings.json` is still valid JSON:
+4. Read `~/.claude/settings.json`
+5. Remove the `"statusLine"` entry from the JSON using Edit tool
+6. Verify `settings.json` is still valid JSON:
    ```bash
    jq . ~/.claude/settings.json > /dev/null
    ```
 
 ### "Config only"
 
-1. Delete config directory only:
+1. Delete config file only:
    ```bash
-   rm -rf ~/.claude/statusline/
+   rm -f ~/.claude/statusline/config.json
    ```
 
 ---
