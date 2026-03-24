@@ -259,7 +259,7 @@ def dw:
   else empty end),
 
   # API key: auto-show cost (replaces rate limits)
-  (if ($is_oauth | not) then
+  (if ($is_oauth | not) and on("cost") then
     ($d.cost.total_cost_usd // null) |
     if . and . > 0 then
       {ord:2, pri:2, txt: (
