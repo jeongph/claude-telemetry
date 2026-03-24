@@ -1,0 +1,6 @@
+{
+  "cwd": "/tmp",
+  "model": {"id": "claude-sonnet-4-6", "display_name": "Sonnet"},
+  "context_window": {"context_window_size": 200000, "used_percentage": 5},
+  "cost": {"total_duration_ms": 60000}
+}
