@@ -16,15 +16,14 @@ Present the following sections as a numbered list. Mark recommended items. Inclu
 
 | Key | Icon | Name (en) | Name (ko) | Description (en) | Description (ko) | Default |
 |-----|------|-----------|-----------|-------------------|-------------------|---------|
-| context | ◆ | Context | 컨텍스트 | Context window usage with progress bar | 컨텍스트 윈도우 사용률 (프로그레스 바) | ON |
-| rate_limits | | Rate Limits | Rate Limits | 5h / 7d rolling window usage | 5시간/7일 사용량 제한 | ON |
+| context | ◆ | Context | 컨텍스트 | Remaining context window % with bar (turns yellow when >200k) | 컨텍스트 윈도우 잔여량 (프로그레스 바, 200k 초과 시 경고색) | ON |
+| rate_limits | | Rate Limits | Rate Limits | Remaining 5h / 7d % with reset countdown | 5시간/7일 잔여량 + 리셋 카운트다운 | ON |
 | duration | ◷ | Elapsed | 경과 시간 | Session elapsed time | 세션 경과 시간 | ON |
-| lines | | Code Changes | 코드 변경 | Lines added/removed in session | 세션 중 추가/삭제된 코드 라인 | ON |
-| warn_200k | ▲ | 200k Warning | 200k 경고 | Alert when tokens exceed 200k | 토큰 200k 초과 시 경고 | ON |
-| cost | | Cost | 비용 | Session cost in USD (API key users only) | 세션 비용 - USD (API 키 사용자 전용) | OFF |
+| git | | Git | Git | folder:branch, sync, changes, untracked, stash, worktrees | 폴더:브랜치, 동기화, 변경, untracked, stash, worktree | ON |
+| lines | | Code Changes | 코드 변경 | Lines added/removed in session | 세션 중 추가/삭제된 코드 라인 | OFF |
+| cost | | Cost | 비용 | Session cost in USD (API key users only, auto-detected) | 세션 비용 - USD (API 키 사용자 전용, 자동 감지) | OFF |
 | api_duration | ↻ | API Duration | API 대기 | Time spent waiting for API responses | API 응답 대기 시간 합계 | OFF |
 | tokens | | Token Details | 토큰 상세 | Input/output token counts | 입출력 토큰 수 상세 | OFF |
-| worktree | ⎇ | Worktree | 워크트리 | Git worktree name (shown only when active) | Git worktree 이름 (활성 시에만 표시) | ON |
 | agent | ▶ | Agent | 에이전트 | Agent name (shown only when active) | 에이전트 이름 (활성 시에만 표시) | ON |
 | vim_mode | | Vim Mode | Vim 모드 | Current vim mode (shown only when enabled) | 현재 Vim 모드 (활성 시에만 표시) | ON |
 

@@ -5,7 +5,6 @@
     "rate_limits": true,
     "duration": true,
     "lines": false,
-    "warn_200k": true,
     "cost": false,
     "api_duration": false,
     "tokens": false,

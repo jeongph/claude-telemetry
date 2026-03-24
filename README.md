@@ -67,7 +67,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 
 - **Remaining % display** — all bars show remaining capacity (like a battery), not usage
 - **Auto user detection** — OAuth users see rate limits, API key users see cost
-- **Git integration** — folder:branch, ↑push/↓pull, changes (+/-), untracked (?N), stash (≡N)
+- **Git integration** — folder:branch, ↑push/↓pull, changes (+/-), untracked (?N), stash (≡N), worktrees (⎇N)
 - **Rate limit countdown** — remaining time until reset (2h 12m/5h)
 - **200k token warning** — context size label turns bold yellow when exceeded
 - **Progress bars** — ▰▱ visualization, color-coded green → yellow → red
@@ -81,7 +81,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 |------|---------|-------------|
 | 1 | Model | Current model name |
 | 1 | Elapsed | Session duration (Nh Nm format) |
-| 1 | Git | folder:branch ↑push ↓pull +add/-del ?untracked ≡stash |
+| 1 | Git | folder:branch ↑push ↓pull +add/-del ?untracked ≡stash ⎇worktrees |
 | 2 | Context | Remaining context window % with bar (yellow when >200k) |
 | 2 | Rate Limits | Remaining 5h / 7d % with reset countdown (OAuth, auto-detected) |
 | 2 | Cost | Session cost in USD (API key, auto-detected) |
