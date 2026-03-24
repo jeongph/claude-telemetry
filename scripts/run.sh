@@ -22,8 +22,8 @@ resolve_lang() {
 }
 
 LANG_CODE=$(resolve_lang)
-COLS=$(tput cols < /dev/tty 2>/dev/null) 2>/dev/null
-[ -z "$COLS" ] && COLS=$(stty size < /dev/tty 2>/dev/null | awk '{print $2}') 2>/dev/null
+COLS=$(tput cols < /dev/tty 2>/dev/null)
+[ -z "$COLS" ] && COLS=$(stty size < /dev/tty 2>/dev/null | awk '{print $2}')
 [ -z "$COLS" ] && COLS=200
 
 # ── Read stdin, then gather git info ──
@@ -168,7 +168,7 @@ def dw:
 (($cfg.user_type // "auto") |
   if . == "oauth" then true
   elif . == "api" then false
-  else $d.rate_limits != null
+  else ($d.rate_limits != null) or (($d.cost.total_cost_usd // 0) <= 0)
   end
 ) as $is_oauth |
 
@@ -243,14 +243,18 @@ def dw:
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
           (if $reset then $reset + D + "/5h " + R else D + "5h " + R end) +
           ($rem | bar_rem) + " " + ($rem | tc_rem) + "\($rem | round)%" + R
-        else empty end),
+        else
+          D + "5h --%" + R
+        end),
       ($d.rate_limits.seven_day // null |
         if . then
           (100 - (.used_percentage // 0)) as $rem |
           (.resets_at // null | if . then fmt_remaining else null end) as $reset |
           (if $reset then $reset + D + "/7d " + R else D + "7d " + R end) +
           ($rem | bar_rem) + " " + ($rem | tc_rem) + "\($rem | round)%" + R
-        else empty end)
+        else
+          D + "7d --%" + R
+        end)
     ] | if length > 0 then {ord:2, pri:2, txt: (join("  "))} else empty end
   else empty end),
 

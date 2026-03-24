@@ -1,5 +1,6 @@
 ---
 description: Interactive setup for Claude Code status line
+allowed-tools: [Bash, Read, Write, AskUserQuestion]
 ---
 
 # Status Line Interactive Setup
@@ -46,22 +47,22 @@ Based on user choices, write `~/.claude/statusline/config.json`:
 ```json
 {
   "sections": {
+    "git": true/false,
     "context": true/false,
     "rate_limits": true/false,
     "duration": true/false,
     "lines": true/false,
-    "warn_200k": true/false,
     "cost": true/false,
     "api_duration": true/false,
     "tokens": true/false,
-    "worktree": true/false,
     "agent": true/false,
     "vim_mode": true/false
   },
   "colors": true/false,
   "bar_width": N,
   "separator": " \u2502 ",
-  "language": "xx"
+  "language": "xx",
+  "user_type": "auto"
 }
 ```
 
@@ -90,4 +91,4 @@ After applying, show a text preview of what the status line will look like with 
 - Use the detected language consistently throughout
 - Use AskUserQuestion for each interactive step
 - Do NOT explain implementation details unless asked
-- The script at `~/.claude/statusline/run.sh` already exists - do not modify it, only configure it
+- The script at `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh` already exists - do not modify it, only configure it
