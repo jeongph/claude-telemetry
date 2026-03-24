@@ -347,6 +347,178 @@ var locales = map[string]map[string]string{
 | NO_COLOR | 미지원 | 지원 |
 | 에러 표시 | `[Timeout]` | 3단계 graceful degradation |
 
+## 테스트 전략
+
+### 단위 테스트
+
+| 대상 | 테스트 내용 |
+|------|------------|
+| `input/parser.go` | JSON 파싱 (정상, null 필드, model string/object, 빈 입력, 잘못된 JSON) |
+| `section/*.go` | 각 섹션별 렌더링 출력 (정상, 데이터 부재, 경계값) |
+| `render/ansi.go` | CJK 너비 계산, ANSI 스트리핑, progress bar 생성 |
+| `config/config.go` | 프리셋 로딩, 글로벌+프로젝트 merge, v1 호환 폴백 |
+| `config/preset.go` | 프리셋별 활성 섹션, 기본 threshold 값 |
+| `git/git.go` | 캐시 hit/miss, TTL 만료, 캐시 파일 깨짐 시 폴백 |
+| `i18n/i18n.go` | 언어별 레이블, 미지원 언어 폴백 |
+
+### 통합 테스트
+
+stdin JSON → Go 바이너리 → stdout 파이프라인의 end-to-end 검증:
+- 샘플 stdin JSON으로 실행하여 출력 형식 검증
+- 각 프리셋별 라인 수 확인
+- NO_COLOR 모드에서 ANSI 코드 없음 확인
+- 설정 없이 실행 시 기본값(normal 프리셋) 동작 확인
+
+### 벤치마크 테스트
+
+`go test -bench` 활용:
+- 렌더링 전체 파이프라인 < 10ms 검증 (캐시 hit 시나리오)
+- CJK 문자열 너비 계산 성능
+- JSON 파싱 성능
+
+### 회귀 테스트
+
+v1(bash+jq) 출력과 v2(Go) 출력의 핵심 정보 일치 검증:
+- 동일 입력에 대해 양쪽 실행 후 수치/상태 비교
+- 색상 코드는 제외하고 텍스트 내용만 비교
+
+## 마이그레이션 계획
+
+### v1 → v2 업그레이드 경로
+
+```
+사용자가 /claude-telemetry:setup 실행
+  → 기존 config.json 감지
+  → v1 형식이면 호환 모드 안내 ("기존 설정 그대로 동작합니다")
+  → 바이너리 다운로드 (OS/아키텍처 자동 감지)
+  → ~/.claude/statusline/bin/claude-telemetry 설치
+  → run.sh를 thin wrapper로 교체
+  → 정상 동작 확인 메시지
+```
+
+### 설정 호환성 규칙
+
+| v1 config 상태 | v2 동작 |
+|----------------|---------|
+| `preset` 없음, `sections` 있음 | sections 기반으로 동작 (v1 호환) |
+| `preset` 있음, `sections` 비어있음 | 프리셋 기본값 적용 |
+| `preset` 있음, `sections`에 개별 값 있음 | 프리셋 기본값 + sections 오버라이드 |
+| `thresholds` 없음 | 기본 임계값 사용 (context_warn:50, context_danger:80, cost_warn:1, cost_danger:5) |
+| 알 수 없는 키 | 무시 (에러 아님) |
+
+### `CLAUDE_STATUSLINE_CONFIG` 환경변수
+
+v1에서 사용하던 커스텀 config 경로 환경변수를 v2에서도 동일하게 지원.
+
+### 롤백 절차
+
+문제 발생 시:
+1. `~/.claude/statusline/bin/claude-telemetry` 삭제
+2. run.sh가 자동으로 `⚠ Run /claude-telemetry:setup to install` 표시
+3. 플러그인을 v1 버전으로 재설치하면 원래 run.sh(jq 기반) 복원
+
+### 버전 관리
+
+- Go 바이너리는 `--version` 플래그 지원
+- setup 커맨드 실행 시 현재 설치된 바이너리 버전과 최신 릴리스 비교
+- 업그레이드 필요 시 안내
+
+## CI/CD 파이프라인
+
+### GitHub Actions 워크플로
+
+**트리거**: `v*` 태그 푸시 (예: `v2.0.0`)
+
+**Go 버전**: 1.22+ (최신 stable)
+
+**빌드 매트릭스**:
+
+| GOOS | GOARCH | 출력 파일 |
+|------|--------|----------|
+| linux | amd64 | `claude-telemetry-linux-amd64` |
+| linux | arm64 | `claude-telemetry-linux-arm64` |
+| darwin | amd64 | `claude-telemetry-darwin-amd64` |
+| darwin | arm64 | `claude-telemetry-darwin-arm64` |
+
+**파이프라인 단계**:
+1. `go test ./...` — 전체 테스트 통과 확인
+2. `go build` — 4개 플랫폼 크로스 컴파일 (CGO_ENABLED=0, 정적 바이너리)
+3. SHA256 체크섬 생성 (`checksums.txt`)
+4. GitHub Release 생성 + 바이너리 및 체크섬 에셋 업로드
+5. `marketplace.json` SHA 갱신 커밋 (자동 또는 수동)
+
+**바이너리 검증**: setup 커맨드에서 다운로드 후 SHA256 체크섬 대조
+
+**Windows/WSL**: 현재 미지원. Claude Code가 공식적으로 Linux/macOS 타겟이며, WSL 사용자는 Linux 바이너리로 동작. 추후 요청에 따라 Windows 네이티브 추가 가능.
+
+## 상세 설계 보충
+
+### model 필드 dual-type 처리
+
+stdin의 `model` 필드는 두 가지 형태로 올 수 있음:
+
+```json
+// 형태 1: object (일반적)
+{"model": {"id": "claude-opus-4-6", "display_name": "Opus"}}
+
+// 형태 2: string (일부 환경)
+{"model": "claude-opus-4-6"}
+```
+
+Go 파서에서 `json.Unmarshal` 시 먼저 object로 시도, 실패 시 string으로 폴백. string인 경우 해당 값을 display_name으로 사용.
+
+### 설정 merge 우선순위 (명확화)
+
+```
+프리셋 기본 sections → 글로벌 config.sections 오버라이드 → 프로젝트 config.sections 오버라이드
+```
+
+예: preset이 `compact`(context=true, git=false)이고 글로벌에 `{"sections":{"git":true}}`이면 → git도 표시.
+개별 `sections` 값은 항상 프리셋 기본값보다 우선.
+
+### 섹션 우선순위 (적응형 너비에서 드롭 순서)
+
+터미널 너비가 부족할 때 낮은 우선순위부터 제거:
+
+| 우선순위 | 섹션 | 이유 |
+|---------|------|------|
+| 1 (최고) | context | 가장 중요한 지표 |
+| 2 | ratelimit / cost | 한도/비용 가시성 |
+| 3 | model | 현재 모델 확인 |
+| 4 | git | 작업 컨텍스트 |
+| 5 | elapsed | 세션 시간 |
+| 6 | lines | 코드 변경량 |
+| 7 | agent | 에이전트 상태 |
+| 8 | apiduration | API 대기시간 |
+| 9 (최저) | tokens | 토큰 상세 |
+
+Line 2의 섹션만 드롭 대상. Line 1, Line 3은 고정 레이아웃.
+
+### git 캐시 동시성
+
+- `repo-hash`: 프로젝트 절대 경로의 SHA256 앞 12자리
+- 동시 세션에서 같은 캐시 파일 접근 시: atomic write (임시 파일 → rename) 로 corruption 방지
+- 캐시 읽기 실패 시: 캐시 무시하고 직접 git 실행 (에러 아님)
+
+### 디버깅 지원
+
+- `--version` — 바이너리 버전 출력
+- `--debug` — stderr에 디버그 로그 출력 (파싱 결과, 캐시 hit/miss, 섹션 드롭 이유 등)
+- status line 출력은 항상 stdout, 디버그는 항상 stderr (서로 간섭 없음)
+
+### config 값 검증
+
+| 필드 | 유효 범위 | 범위 밖 동작 |
+|------|----------|-------------|
+| `bar_width` | 3~10 | clamp (3 미만→3, 10 초과→10) |
+| `preset` | compact, normal, detailed | 인식 못하면 normal 폴백 |
+| `language` | auto, en, ko, ja, zh | 인식 못하면 en 폴백 |
+| `thresholds.*` | 0~100 (%, $) | clamp to valid range |
+
+### effort level은 model 섹션에 포함
+
+effort level은 독립 섹션이 아니라 model 섹션의 일부로 표시. 모든 프리셋에서 model 섹션이 활성이면 effort도 함께 표시.
+
 ## 의도적 미지원
 
 | 기능 | 이유 |
