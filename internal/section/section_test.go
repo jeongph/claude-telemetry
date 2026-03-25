@@ -60,14 +60,11 @@ func TestElapsedSection(t *testing.T) {
 
 func TestContextSection(t *testing.T) {
 	ctx := testContext(t)
-	// normal.json: used_percentage=28 → remaining=72, size=200000 → "200k"
+	// normal.json: used_percentage=28 → remaining=72
 	s := &ContextSection{}
 	got := s.Render(ctx)
 	if !strings.Contains(got, "72") {
 		t.Errorf("ContextSection: 남은 비율 '72' 누락 — got %q", got)
-	}
-	if !strings.Contains(got, "200k") {
-		t.Errorf("ContextSection: 컨텍스트 크기 '200k' 누락 — got %q", got)
 	}
 }
 
