@@ -36,6 +36,11 @@ func formatDuration(ms float64, c render.Colors) string {
 	white := func(n int) string { return c.White(fmt.Sprintf("%d", n)) }
 	dim := func(u string) string { return c.Dim(u) }
 
+	if ms >= 86400000 {
+		days := hours / 24
+		remainHours := hours % 24
+		return white(days) + dim("d") + " " + white(remainHours) + dim("h")
+	}
 	if ms >= 3600000 {
 		return white(hours) + dim("h") + " " + white(minutes) + dim("m")
 	}
