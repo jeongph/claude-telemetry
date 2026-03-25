@@ -17,11 +17,12 @@ func (s *ContextSection) Render(ctx *Context) string {
 	label := ctx.Locale.Get("context")
 	prefix := ctx.Colors.Cyan("◆") + " " + ctx.Colors.Dim(label)
 
+	var remaining float64
 	if cw.UsedPercentage == nil {
-		return prefix + " " + ctx.Colors.Dim("···")
+		remaining = 100.0 // 새 세션: 아직 미사용
+	} else {
+		remaining = 100.0 - *cw.UsedPercentage
 	}
-
-	remaining := 100.0 - *cw.UsedPercentage
 
 	bar := render.ProgressBarRemaining(
 		remaining,
