@@ -19,26 +19,28 @@ func (s *RateLimitSection) Render(ctx *Context) string {
 		return ""
 	}
 
-	var parts []string
+	prefix := ctx.Colors.Cyan("◇") + " " + ctx.Colors.Dim("Remaining") + " "
+
+	var windows []string
 
 	if rl.FiveHour != nil {
-		parts = append(parts, renderRateWindow(rl.FiveHour.UsedPercentage, rl.FiveHour.ResetsAt, "5h", ctx))
+		windows = append(windows, renderRateWindow(rl.FiveHour.UsedPercentage, rl.FiveHour.ResetsAt, "5h", ctx))
 	} else {
-		parts = append(parts, ctx.Colors.Dim("5h")+" "+ctx.Colors.Dim("···"))
+		windows = append(windows, ctx.Colors.Dim("5h")+" "+ctx.Colors.Dim("···"))
 	}
 
 	if rl.SevenDay != nil {
-		parts = append(parts, renderRateWindow(rl.SevenDay.UsedPercentage, rl.SevenDay.ResetsAt, "7d", ctx))
+		windows = append(windows, renderRateWindow(rl.SevenDay.UsedPercentage, rl.SevenDay.ResetsAt, "7d", ctx))
 	} else {
-		parts = append(parts, ctx.Colors.Dim("7d")+" "+ctx.Colors.Dim("···"))
+		windows = append(windows, ctx.Colors.Dim("7d")+" "+ctx.Colors.Dim("···"))
 	}
 
-	result := ""
-	for i, p := range parts {
+	result := prefix
+	for i, w := range windows {
 		if i > 0 {
-			result += " "
+			result += " " + ctx.Colors.Dim("/") + " "
 		}
-		result += p
+		result += w
 	}
 	return result
 }
@@ -87,8 +89,9 @@ func renderRateWindow(usedPct float64, resetsAt float64, label string, ctx *Cont
 
 	labelStr := ctx.Colors.Dim(label)
 
+	result := labelStr + " " + bar + " " + pctStr
 	if countdown != "" {
-		return countdown + "/" + labelStr + " " + bar + " " + pctStr
+		result += " " + ctx.Colors.Dim("(") + countdown + ctx.Colors.Dim(")")
 	}
-	return labelStr + " " + bar + " " + pctStr
+	return result
 }
