@@ -40,15 +40,7 @@ func (s *ContextSection) Render(ctx *Context) string {
 	)
 	pctStr := render.ApplyColor(colorName, fmt.Sprintf("%.0f%%", remaining), ctx.Colors)
 
-	size := formatContextSize(cw.ContextWindowSize)
-	var sizeStr string
-	if ctx.Input.Exceeds200K {
-		sizeStr = ctx.Colors.Yellow(size)
-	} else {
-		sizeStr = ctx.Colors.Dim(size)
-	}
-
-	return prefix + " " + bar + " " + pctStr + " (" + sizeStr + ")"
+	return prefix + " " + bar + " " + pctStr
 }
 
 func (s *ContextSection) Width(ctx *Context) int {
