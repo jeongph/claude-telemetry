@@ -1,19 +1,15 @@
 {
-  "sections": {
-    "git": true,
-    "context": true,
-    "rate_limits": true,
-    "duration": true,
-    "lines": false,
-    "cost": false,
-    "api_duration": false,
-    "tokens": false,
-    "agent": true,
-    "vim_mode": true
-  },
+  "preset": "normal",
+  "language": "auto",
   "colors": true,
   "bar_width": 5,
-  "separator": " \u2502 ",
-  "language": "en",
-  "user_type": "auto"
+  "separator": " │ ",
+  "user_type": "auto",
+  "sections": {},
+  "thresholds": {
+    "context_warn": 50,
+    "context_danger": 80,
+    "cost_warn": 1.0,
+    "cost_danger": 5.0
+  }
 }

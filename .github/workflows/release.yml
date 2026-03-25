@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - run: go test ./... -v
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: '0'
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          go build -ldflags="-s -w -X main.version=$VERSION" \
+            -o claude-telemetry-${{ matrix.goos }}-${{ matrix.goarch }} \
+            ./cmd/claude-telemetry
+      - uses: actions/upload-artifact@v4
+        with:
+          name: claude-telemetry-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: claude-telemetry-${{ matrix.goos }}-${{ matrix.goarch }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - name: Generate checksums
+        run: |
+          for dir in claude-telemetry-*/; do
+            (cd "$dir" && sha256sum * >> ../checksums.txt)
+          done
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            claude-telemetry-linux-amd64/*
+            claude-telemetry-linux-arm64/*
+            claude-telemetry-darwin-amd64/*
+            claude-telemetry-darwin-arm64/*
+            checksums.txt
