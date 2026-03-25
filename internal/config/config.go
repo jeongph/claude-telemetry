@@ -44,7 +44,7 @@ func defaultConfig() Config {
 		Sections:  map[string]bool{},
 		Thresholds: Thresholds{
 			ContextWarn:   50,
-			ContextDanger: 80,
+			ContextDanger: 20,
 			CostWarn:      1.0,
 			CostDanger:    5.0,
 		},
