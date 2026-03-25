@@ -39,7 +39,7 @@ Call AskUserQuestion with EXACTLY this structure (translate to detected language
       },
       {
         "label": "<translated: Config only>",
-        "description": "<translated: Delete config file only, keep binary and statusLine entry in settings.json>"
+        "description": "<translated: Delete config file only, keep binary and statusLine entry>"
       },
       {
         "label": "<translated: Cancel>",
@@ -64,20 +64,17 @@ Based on user choice:
    ```bash
    rm -f ~/.claude/statusline/bin/claude-telemetry
    ```
-2. Remove the git cache directory:
-   ```bash
-   rm -rf ~/.claude/statusline/cache/
-   ```
-3. Delete the full config directory:
+2. Remove the full statusline directory (config, cache, bin):
    ```bash
    rm -rf ~/.claude/statusline/
    ```
-4. Read `~/.claude/settings.json`
-5. Remove the `"statusLine"` entry from the JSON using Edit tool
-6. Verify `settings.json` is still valid JSON:
+3. Read `~/.claude/settings.json`
+4. Remove the `"statusLine"` entry from the JSON using Edit tool
+5. Verify settings.json is still valid JSON:
    ```bash
-   jq . ~/.claude/settings.json > /dev/null
+   python3 -c "import json; json.load(open('$HOME/.claude/settings.json'))" 2>/dev/null || echo "INVALID"
    ```
+   If invalid, warn the user and suggest manual fix.
 
 ### "Config only"
 
@@ -93,9 +90,9 @@ Based on user choice:
 Output a completion message using this EXACT template (translate to detected language):
 
 ```
-Status line 설정이 제거되었습니다. Claude Code를 재시작하면 적용됩니다.
+Status line configuration has been removed. Restart Claude Code to apply.
 
-다시 설정하려면: /claude-telemetry:setup
+To set up again: /claude-telemetry:setup
 ```
 
 ---
