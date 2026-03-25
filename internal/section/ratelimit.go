@@ -19,7 +19,7 @@ func (s *RateLimitSection) Render(ctx *Context) string {
 		return ""
 	}
 
-	prefix := ctx.Colors.Cyan("◇") + " " + ctx.Colors.Dim("Remaining") + " "
+	prefix := ctx.Colors.Cyan("◆") + " " + ctx.Colors.Dim("Remaining") + " "
 
 	var windows []string
 
