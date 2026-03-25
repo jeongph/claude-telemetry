@@ -9,7 +9,7 @@ You are helping the user configure their Claude Code status line.
 
 ## Execution Flow
 
-Execute steps 1 → 2 → 3 → 4 → 5 → 6 sequentially. Do NOT skip steps. Do NOT combine steps.
+Execute steps 1 → 2 → 3 → 4 → 5 → 6 → 7 sequentially. Do NOT skip steps. Do NOT combine steps.
 
 ---
 
@@ -22,28 +22,83 @@ Execute steps 1 → 2 → 3 → 4 → 5 → 6 sequentially. Do NOT skip steps. D
 
 ---
 
-## Step 2: Section Selection
+## Step 2: Download Go Binary
+
+1. Check if Go binary already exists:
+   ```bash
+   ~/.claude/statusline/bin/claude-telemetry --version 2>/dev/null
+   ```
+   If it exists, show the current version and ask if user wants to update. If user says no, skip to Step 3.
+
+2. Detect OS:
+   ```bash
+   uname -s
+   ```
+   Map: `Linux` → `linux`, `Darwin` → `darwin`
+
+3. Detect architecture:
+   ```bash
+   uname -m
+   ```
+   Map: `x86_64` → `amd64`, `aarch64` → `arm64`, `arm64` → `arm64`
+
+4. Create the binary directory:
+   ```bash
+   mkdir -p ~/.claude/statusline/bin
+   ```
+
+5. Download the binary from GitHub Releases:
+   ```bash
+   curl -fsSL "https://github.com/jeongph/claude-telemetry/releases/latest/download/claude-telemetry-{os}-{arch}" \
+     -o ~/.claude/statusline/bin/claude-telemetry
+   ```
+   (Replace `{os}` and `{arch}` with the detected values.)
+
+6. Make it executable:
+   ```bash
+   chmod +x ~/.claude/statusline/bin/claude-telemetry
+   ```
+
+7. Verify the binary works:
+   ```bash
+   ~/.claude/statusline/bin/claude-telemetry --version
+   ```
+   If this fails, inform the user and stop.
+
+---
+
+## Step 3: Check Existing Configuration
+
+1. Check if `~/.claude/statusline/config.json` exists
+2. If exists:
+   - Inform user: "<translated: Existing configuration found. Your current settings will be preserved.>"
+   - **Skip to Step 6** (keep existing config, just ensure statusLine is configured)
+3. If not exists: proceed to Step 4
+
+---
+
+## Step 4: Section Selection
 
 Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions to detected language):
 
 ```json
 {
   "questions": [{
-    "question": "<translated: Which sections would you like to enable?>",
-    "header": "Sections",
+    "question": "<translated: Choose a display preset>",
+    "header": "Preset",
     "multiSelect": false,
     "options": [
       {
-        "label": "<translated: Recommended defaults>",
-        "description": "◆ Context, Rate Limits, ◷ Elapsed, Git, ▶ Agent, Vim Mode"
+        "label": "<translated: Normal (Recommended)>",
+        "description": "Model, ◷ Elapsed, Git, ◆ Context, ◆ Remaining, ▶ Agent, Vim"
       },
       {
-        "label": "<translated: All ON>",
-        "description": "<translated: Enable all 10 sections>"
+        "label": "<translated: Detailed>",
+        "description": "<translated: All sections enabled including Tokens, API Duration, Code Changes>"
       },
       {
-        "label": "<translated: Minimal>",
-        "description": "<translated: Context + Rate Limits only>"
+        "label": "<translated: Compact>",
+        "description": "<translated: Single line — Model, Context, Remaining only>"
       },
       {
         "label": "<translated: Custom>",
@@ -64,23 +119,9 @@ Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions 
     "multiSelect": true,
     "options": [
       {"label": "◆ Context", "description": "<translated: Remaining context window % with progress bar>"},
-      {"label": "Rate Limits", "description": "<translated: 5h/7d remaining % with reset countdown>"},
+      {"label": "◆ Remaining", "description": "<translated: 5h/7d remaining % with reset countdown>"},
       {"label": "◷ Elapsed", "description": "<translated: Session elapsed time>"},
-      {"label": "Git", "description": "<translated: folder:branch, sync, changes, untracked, stash, worktree>"}
-    ]
-  }]
-}
-```
-
-Then a second AskUserQuestion for the remaining sections:
-
-```json
-{
-  "questions": [{
-    "question": "<translated: Select additional sections to enable>",
-    "header": "Additional",
-    "multiSelect": true,
-    "options": [
+      {"label": "Git", "description": "<translated: folder:branch, sync, changes, untracked, stash, worktree>"},
       {"label": "Code Changes", "description": "<translated: Lines added/removed in session>"},
       {"label": "Cost", "description": "<translated: Session cost in USD (API key users only)>"},
       {"label": "↻ API Duration", "description": "<translated: Time spent waiting for API responses>"},
@@ -92,98 +133,60 @@ Then a second AskUserQuestion for the remaining sections:
 
 Note: Agent and Vim Mode are always ON in Custom mode (they only appear when active, no downside).
 
-### Section key mapping
+### Preset mappings
+
+| Preset | preset value | Config sections override |
+|--------|-------------|------------------------|
+| Normal | `"normal"` | (empty — use preset defaults) |
+| Detailed | `"detailed"` | (empty — use preset defaults) |
+| Compact | `"compact"` | (empty — use preset defaults) |
+| Custom | `"normal"` | (user selection as overrides) |
+
+### Custom section key mapping
 
 | Option label | Config key |
 |---|---|
 | ◆ Context | context |
-| Rate Limits | rate_limits |
-| ◷ Elapsed | duration |
+| ◆ Remaining | ratelimit |
+| ◷ Elapsed | elapsed |
 | Git | git |
 | Code Changes | lines |
 | Cost | cost |
-| ↻ API Duration | api_duration |
+| ↻ API Duration | apiduration |
 | Token Details | tokens |
 
-### Preset mappings
-
-| Preset | ON | OFF |
-|--------|----|----|
-| Recommended | context, rate_limits, duration, git, agent, vim_mode | lines, cost, api_duration, tokens |
-| All ON | ALL sections | (none) |
-| Minimal | context, rate_limits, agent, vim_mode | duration, git, lines, cost, api_duration, tokens |
-
 ---
 
-## Step 3: Style Preferences
-
-Call AskUserQuestion with EXACTLY this structure:
-
-```json
-{
-  "questions": [{
-    "question": "<translated: Choose your style preferences>",
-    "header": "Style",
-    "multiSelect": false,
-    "options": [
-      {
-        "label": "<translated: Defaults>",
-        "description": "<translated: Bar width: 5, Colors: ON, Labels: en>"
-      },
-      {
-        "label": "<translated: Localized labels>",
-        "description": "<translated: Bar width: 5, Colors: ON, Labels: (detected language)>"
-      },
-      {
-        "label": "<translated: Compact>",
-        "description": "<translated: Bar width: 3, Colors: ON, Labels: en>"
-      }
-    ]
-  }]
-}
-```
-
-### Style preset mappings
-
-| Preset | bar_width | colors | language |
-|--------|-----------|--------|----------|
-| Defaults | 5 | true | "en" |
-| Localized | 5 | true | (detected language code) |
-| Compact | 3 | true | "en" |
-| (Custom) | user input (3-10) | user input | user input |
-
----
-
-## Step 4: Write Configuration
+## Step 5: Write Configuration
 
 1. Run `mkdir -p ~/.claude/statusline`
-2. Write `~/.claude/statusline/config.json` with the following structure:
+2. Write `~/.claude/statusline/config.json`:
 
 ```json
 {
-  "sections": {
-    "git": <bool>,
-    "context": <bool>,
-    "rate_limits": <bool>,
-    "duration": <bool>,
-    "lines": <bool>,
-    "cost": <bool>,
-    "api_duration": <bool>,
-    "tokens": <bool>,
-    "agent": <bool>,
-    "vim_mode": <bool>
-  },
-  "colors": <bool>,
-  "bar_width": <int>,
-  "separator": " │ ",
+  "preset": "<preset_value>",
   "language": "<lang_code>",
-  "user_type": "auto"
+  "colors": true,
+  "bar_width": 5,
+  "separator": " │ ",
+  "user_type": "auto",
+  "sections": {},
+  "thresholds": {
+    "context_warn": 50,
+    "context_danger": 20,
+    "cost_warn": 1.0,
+    "cost_danger": 5.0
+  }
 }
 ```
 
+- Set `preset` from Step 4 selection
+- For Custom: populate `sections` with user selections (only non-default values needed)
+- Set `language` to detected language code, or `"en"` for Defaults
+
 ---
 
-## Step 5: Configure statusLine in settings.json
+## Step 6: Configure statusLine in settings.json
 
 1. Resolve the script path: `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh`
 2. Read `~/.claude/settings.json`
@@ -201,22 +204,23 @@ Call AskUserQuestion with EXACTLY this structure:
 
 ---
 
-## Step 6: Preview & Done
+## Step 7: Preview & Done
 
-Output a preview using this EXACT template (substitute values based on user selections):
+Output a preview using this EXACT template (substitute values based on user selections, translate to detected language):
 
 ```
-📋 설정 완료! 미리보기:
+Setup complete! Preview:
 
-Line 1: Opus 4.6 │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2
-Line 2: ◆ Context ▰▰▰▱▱ 55% (200k) │ 3h 45m/5h ▰▰▰▰▱ 70%  6d 12h/7d ▰▰▰▰▰ 94%
-Line 3: ▶ code-explorer
+Line 1: Opus │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2
+Line 2: ◆ Context ▰▰▰▱▱ 55% │ ◆ Remaining 5h ▰▰▰▰▱ 70% (3h 45m) / 7d ▰▰▰▰▰ 94% (6d 12h)
+Line 3: ▶ code-explorer │ NORMAL
 
-Claude Code를 재시작하면 적용됩니다.
+Restart Claude Code to apply.
 ```
 
 - Only show sections the user enabled
 - Adjust bar width to match user's choice
+- For compact preset, show single line preview
 - Translate the message to detected language
 
 ---
@@ -228,3 +232,4 @@ Claude Code를 재시작하면 적용됩니다.
 - Follow AskUserQuestion structures EXACTLY as specified above
 - Do NOT modify `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh`
 - Do NOT output text between AskUserQuestion calls except brief transitions
+- Preserve existing config.json if it already exists (Step 3)
