@@ -73,12 +73,12 @@ func TestContextSection(t *testing.T) {
 
 func TestContextSectionNull(t *testing.T) {
 	ctx := testContext(t)
-	// nil UsedPercentage → show "···"
+	// nil UsedPercentage → 새 세션, 100% 표시
 	ctx.Input.ContextWindow.UsedPercentage = nil
 	s := &ContextSection{}
 	got := s.Render(ctx)
-	if !strings.Contains(got, "···") {
-		t.Errorf("ContextSection(nil): '···' 누락 — got %q", got)
+	if !strings.Contains(got, "100%") {
+		t.Errorf("ContextSection(nil): 새 세션은 100%% 표시해야 함 — got %q", got)
 	}
 }
 
