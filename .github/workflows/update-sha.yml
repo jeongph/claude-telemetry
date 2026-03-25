@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - '.claude-plugin/marketplace.json'
 
+permissions:
+  contents: write
+
 jobs:
   update-sha:
     runs-on: ubuntu-latest
