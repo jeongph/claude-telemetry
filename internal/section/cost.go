@@ -14,6 +14,10 @@ func (s *CostSection) Name() string  { return "cost" }
 func (s *CostSection) Priority() int { return 2 }
 
 func (s *CostSection) Render(ctx *Context) string {
+	// OAuth 사용자(rate_limits 존재)면 cost 미표시
+	if ctx.Input.RateLimits != nil {
+		return ""
+	}
 	cost := ctx.Input.Cost.TotalCostUSD
 	if cost == 0 {
 		return ""
