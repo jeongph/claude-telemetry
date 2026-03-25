@@ -15,11 +15,20 @@ func (s *RateLimitSection) Priority() int { return 2 }
 
 func (s *RateLimitSection) Render(ctx *Context) string {
 	rl := ctx.Input.RateLimits
-	if rl == nil {
-		return ""
-	}
-
 	prefix := ctx.Colors.Cyan("◆") + " " + ctx.Colors.Dim("Remaining") + " "
+
+	// rate_limits가 nil: OAuth 초기 상태면 ··· 표시, API key 사용자면 미표시
+	if rl == nil {
+		// cost > 0이면 API key 사용자 → 미표시
+		if ctx.Input.Cost.TotalCostUSD > 0 {
+			return ""
+		}
+		// OAuth 초기 상태 → 대기 표시
+		loading := ctx.Colors.Dim("5h") + " " + ctx.Colors.Dim("···") +
+			" " + ctx.Colors.Dim("/") + " " +
+			ctx.Colors.Dim("7d") + " " + ctx.Colors.Dim("···")
+		return prefix + loading
+	}
 
 	var windows []string
 
