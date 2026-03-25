@@ -50,12 +50,20 @@ func (s *RateLimitSection) Width(ctx *Context) int {
 // renderRateWindow renders a single rate limit window.
 // remaining = 100 - used_percentage (stdin gives used, we show remaining).
 func renderRateWindow(usedPct float64, resetsAt float64, label string, ctx *Context) string {
+	// resets_at이 과거 → 리셋됨, 정확한 값 알 수 없음
+	if resetsAt > 0 {
+		resetTime := time.Unix(int64(resetsAt), 0)
+		if time.Now().After(resetTime) {
+			emptyBar := render.ProgressBarRemaining(0, ctx.Config.BarWidth, ctx.Colors, 50, 20)
+			return ctx.Colors.Dim(label) + " " + emptyBar + " " + ctx.Colors.Dim("···")
+		}
+	}
+
 	remaining := 100.0 - usedPct
 
 	countdown := ""
 	if resetsAt > 0 {
-		resetTime := time.Unix(int64(resetsAt), 0)
-		diff := time.Until(resetTime)
+		diff := time.Until(time.Unix(int64(resetsAt), 0))
 		if diff > 0 {
 			countdown = formatDuration(float64(diff.Milliseconds()), ctx.Colors)
 		}

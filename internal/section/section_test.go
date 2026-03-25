@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jeongph/claude-telemetry/internal/config"
 	"github.com/jeongph/claude-telemetry/internal/gitinfo"
@@ -81,16 +82,29 @@ func TestContextSectionNull(t *testing.T) {
 	}
 }
 
-func TestRateLimitSection(t *testing.T) {
+func TestRateLimitSectionExpired(t *testing.T) {
 	ctx := testContext(t)
+	// normal.json의 resets_at은 과거 → 리셋됨 표시
 	s := &RateLimitSection{}
 	got := s.Render(ctx)
 	if !strings.Contains(got, "5h") {
 		t.Errorf("RateLimitSection: '5h' 누락 — got %q", got)
 	}
-	// Should contain percentage (100 - 12 = 88 or 100 - 35 = 65)
+	if !strings.Contains(got, "···") {
+		t.Errorf("RateLimitSection: 리셋 후 '···' 표시 필요 — got %q", got)
+	}
+}
+
+func TestRateLimitSectionActive(t *testing.T) {
+	ctx := testContext(t)
+	// resets_at을 미래로 설정
+	futureTS := float64(time.Now().Add(2 * time.Hour).Unix())
+	ctx.Input.RateLimits.FiveHour.ResetsAt = futureTS
+	ctx.Input.RateLimits.SevenDay.ResetsAt = float64(time.Now().Add(4 * 24 * time.Hour).Unix())
+	s := &RateLimitSection{}
+	got := s.Render(ctx)
 	if !strings.Contains(got, "%") {
-		t.Errorf("RateLimitSection: '%%' 누락 — got %q", got)
+		t.Errorf("RateLimitSection: 활성 상태에서 '%%' 필요 — got %q", got)
 	}
 }
 
