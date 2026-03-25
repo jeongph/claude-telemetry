@@ -1,0 +1,32 @@
+name: Update marketplace SHA
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.claude-plugin/marketplace.json'
+
+jobs:
+  update-sha:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update SHA in marketplace.json
+        run: |
+          SHA=$(git rev-parse HEAD)
+          sed -i "s/\"sha\": \"[a-f0-9]*\"/\"sha\": \"$SHA\"/" .claude-plugin/marketplace.json
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet .claude-plugin/marketplace.json && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .claude-plugin/marketplace.json
+          git commit -m "chore: marketplace.json SHA 자동 갱신"
+          git push
