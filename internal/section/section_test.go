@@ -105,6 +105,41 @@ func TestRateLimitSectionActive(t *testing.T) {
 	}
 }
 
+func TestFormatDuration(t *testing.T) {
+	noColor := render.NewColors(false)
+	tests := []struct {
+		name     string
+		ms       float64
+		contains []string
+	}{
+		{"초 단위", 45000, []string{"45", "s"}},
+		{"분+초", 754000, []string{"12", "m", "34", "s"}},
+		{"시+분", 7500000, []string{"2", "h", "5", "m"}},
+		{"일+시 (24h 이상)", 367440000, []string{"4", "d", "6", "h"}},
+		{"정확히 24h", 86400000, []string{"1", "d", "0", "h"}},
+		{"48h", 172800000, []string{"2", "d", "0", "h"}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := formatDuration(tc.ms, noColor)
+			for _, want := range tc.contains {
+				if !strings.Contains(got, want) {
+					t.Errorf("formatDuration(%v): %q 누락 — got %q", tc.ms, want, got)
+				}
+			}
+		})
+	}
+}
+
+func TestFormatDurationNoDaysBelowThreshold(t *testing.T) {
+	noColor := render.NewColors(false)
+	// 23h 59m → "d" 가 포함되면 안 됨
+	got := formatDuration(86340000, noColor)
+	if strings.Contains(got, "d") {
+		t.Errorf("24h 미만인데 'd' 표시됨 — got %q", got)
+	}
+}
+
 func TestCostSection(t *testing.T) {
 	ctx := testContext(t)
 	// set rate_limits = nil to show cost (API key user)
