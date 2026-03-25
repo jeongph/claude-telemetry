@@ -13,11 +13,7 @@ func (s *ModelSection) Render(ctx *Context) string {
 	if name == "" {
 		return ""
 	}
-	out := ctx.Colors.Cyan(name)
-	if ctx.Effort != "" {
-		out += " " + ctx.Colors.Dim("💭"+ctx.Effort)
-	}
-	return out
+	return ctx.Colors.Cyan(name)
 }
 
 func (s *ModelSection) Width(ctx *Context) int {

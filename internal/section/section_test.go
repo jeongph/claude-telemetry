@@ -39,8 +39,8 @@ func TestModelSection(t *testing.T) {
 	if !strings.Contains(got, "Opus") {
 		t.Errorf("ModelSection: 모델명 'Opus' 누락 — got %q", got)
 	}
-	if !strings.Contains(got, "high") {
-		t.Errorf("ModelSection: effort 'high' 누락 — got %q", got)
+	if strings.Contains(got, "high") {
+		t.Errorf("ModelSection: effort는 표시하지 않아야 함 — got %q", got)
 	}
 }
 
