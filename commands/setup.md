@@ -24,46 +24,33 @@ Execute steps 1 → 2 → 3 → 4 → 5 → 6 → 7 sequentially. Do NOT skip st
 
 ## Step 2: Download Go Binary
 
-1. Check if Go binary already exists:
-   ```bash
-   ~/.claude/statusline/bin/claude-telemetry --version 2>/dev/null
-   ```
-   If it exists, show the current version and ask if user wants to update. If user says no, skip to Step 3.
+Run this EXACT script as a single Bash command. Do NOT split it into multiple commands:
 
-2. Detect OS:
-   ```bash
-   uname -s
-   ```
-   Map: `Linux` → `linux`, `Darwin` → `darwin`
+```bash
+EXISTING_VER=$(~/.claude/statusline/bin/claude-telemetry --version 2>/dev/null)
+if [ -n "$EXISTING_VER" ]; then
+  echo "INSTALLED: $EXISTING_VER"
+else
+  OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+  ARCH=$(uname -m)
+  case "$ARCH" in
+    x86_64) ARCH="amd64" ;;
+    aarch64|arm64) ARCH="arm64" ;;
+  esac
+  mkdir -p ~/.claude/statusline/bin
+  URL="https://github.com/jeongph/claude-telemetry/releases/latest/download/claude-telemetry-${OS}-${ARCH}"
+  echo "Downloading: $URL"
+  curl -fsSL "$URL" -o ~/.claude/statusline/bin/claude-telemetry && \
+  chmod +x ~/.claude/statusline/bin/claude-telemetry && \
+  ~/.claude/statusline/bin/claude-telemetry --version && \
+  echo "SUCCESS" || echo "DOWNLOAD_FAILED"
+fi
+```
 
-3. Detect architecture:
-   ```bash
-   uname -m
-   ```
-   Map: `x86_64` → `amd64`, `aarch64` → `arm64`, `arm64` → `arm64`
-
-4. Create the binary directory:
-   ```bash
-   mkdir -p ~/.claude/statusline/bin
-   ```
-
-5. Download the binary from GitHub Releases:
-   ```bash
-   curl -fsSL "https://github.com/jeongph/claude-telemetry/releases/latest/download/claude-telemetry-{os}-{arch}" \
-     -o ~/.claude/statusline/bin/claude-telemetry
-   ```
-   (Replace `{os}` and `{arch}` with the detected values.)
-
-6. Make it executable:
-   ```bash
-   chmod +x ~/.claude/statusline/bin/claude-telemetry
-   ```
-
-7. Verify the binary works:
-   ```bash
-   ~/.claude/statusline/bin/claude-telemetry --version
-   ```
-   If this fails, inform the user and stop.
+Handle the output:
+- If `INSTALLED: ...` → show the version to the user, ask if they want to update. If yes, re-run the script with the download portion (remove the version check). If no, skip to Step 3.
+- If `SUCCESS` → proceed to Step 3
+- If `DOWNLOAD_FAILED` → inform user the download failed and stop
 
 ---
 
