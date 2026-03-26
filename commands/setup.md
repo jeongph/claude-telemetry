@@ -17,8 +17,28 @@ Execute steps 1 → 2 → 3 → 4 → 5 → 6 → 7 sequentially. Do NOT skip st
 
 1. Read `~/.claude/settings.json`
 2. Check the `language` field
-3. Map: `"한국어"` → ko, `"English"` → en, `"日本語"` → ja, `"中文"` → zh. Default: en
-4. Use this language for ALL user-facing text in the remaining steps
+3. Map: `"한국어"` → ko, `"English"` → en, `"日本語"` → ja, `"中文"` → zh
+4. If the `language` field is missing or does not match any mapping → ask the user:
+
+```json
+{
+  "questions": [{
+    "question": "Select your preferred language for the status line",
+    "header": "Language",
+    "multiSelect": false,
+    "options": [
+      {"label": "English"},
+      {"label": "한국어"},
+      {"label": "日本語"},
+      {"label": "中文"}
+    ]
+  }]
+}
+```
+
+Map the selection: "English" → en, "한국어" → ko, "日本語" → ja, "中文" → zh
+
+5. Use this language for ALL user-facing text in the remaining steps. Do NOT infer language from conversation context.
 
 ---
 

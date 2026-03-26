@@ -15,7 +15,8 @@ func (s *RateLimitSection) Priority() int { return 2 }
 
 func (s *RateLimitSection) Render(ctx *Context) string {
 	rl := ctx.Input.RateLimits
-	prefix := ctx.Colors.Cyan("◆") + " " + ctx.Colors.Dim("Remaining") + " "
+	label := ctx.Locale.Get("ratelimit")
+	prefix := ctx.Colors.Cyan("◆") + " " + ctx.Colors.Dim(label) + " "
 
 	// rate_limits가 nil: OAuth 초기 상태면 ··· 표시, API key 사용자면 미표시
 	if rl == nil {
