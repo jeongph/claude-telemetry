@@ -8,7 +8,7 @@
   "sections": {},
   "thresholds": {
     "context_warn": 50,
-    "context_danger": 80,
+    "context_danger": 20,
     "cost_warn": 1.0,
     "cost_danger": 5.0
   }

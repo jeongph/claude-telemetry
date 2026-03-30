@@ -1,5 +1,13 @@
 {
   "name": "claude-telemetry",
   "version": "2.0.0",
-  "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal"
+  "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
+  "author": {
+    "name": "JeongUk Park",
+    "url": "https://github.com/jeongph"
+  },
+  "homepage": "https://github.com/jeongph/claude-telemetry",
+  "repository": "https://github.com/jeongph/claude-telemetry",
+  "license": "MIT",
+  "keywords": ["status-line", "telemetry", "monitoring", "productivity"]
 }
