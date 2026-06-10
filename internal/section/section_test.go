@@ -360,10 +360,38 @@ func TestPRSectionReviewStates(t *testing.T) {
 	}
 }
 
+func TestThinkingSection(t *testing.T) {
+	ctx := testContext(t)
+	// normal.json: thinking.enabled = true
+	s := &ThinkingSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "✦") {
+		t.Errorf("ThinkingSection: '✦' 누락 — got %q", got)
+	}
+}
+
+func TestThinkingSectionDisabled(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.Thinking = &input.Thinking{Enabled: false}
+	s := &ThinkingSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("ThinkingSection(disabled): 빈 문자열 기대, got %q", got)
+	}
+}
+
+func TestThinkingSectionNil(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.Thinking = nil
+	s := &ThinkingSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("ThinkingSection(nil): 빈 문자열 기대, got %q", got)
+	}
+}
+
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
-	if len(sections) != 14 {
-		t.Errorf("AllSections: 14개 기대, got %d", len(sections))
+	if len(sections) != 15 {
+		t.Errorf("AllSections: 15개 기대, got %d", len(sections))
 	}
 }
 
