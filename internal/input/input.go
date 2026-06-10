@@ -12,7 +12,7 @@ type Input struct {
 	SessionName    string          `json:"session_name"`
 	TranscriptPath string          `json:"transcript_path"`
 	Version        string          `json:"version"`
-	Model          ModelInfo       `json:"-"`        // RawModel에서 파싱
+	Model          ModelInfo       `json:"-"` // RawModel에서 파싱
 	RawModel       json.RawMessage `json:"model"`
 	Workspace      *Workspace      `json:"workspace"`
 	OutputStyle    *OutputStyle    `json:"output_style"`
