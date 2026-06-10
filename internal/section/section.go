@@ -40,6 +40,7 @@ func AllSections() []LineSection {
 		{&EffortSection{}, 1},
 		{&ElapsedSection{}, 1},
 		{&GitSection{}, 1},
+		{&PRSection{}, 1},
 		// Line 2
 		{&ContextSection{}, 2},
 		{&RateLimitSection{}, 2},

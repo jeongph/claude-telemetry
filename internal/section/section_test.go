@@ -305,10 +305,42 @@ func TestSessionSectionExactWidth(t *testing.T) {
 	}
 }
 
+func TestPRSection(t *testing.T) {
+	ctx := testContext(t)
+	// normal.json: pr.number = 1234, review_state = "approved"
+	s := &PRSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "PR#1234") {
+		t.Errorf("PRSection: 'PR#1234' 누락 — got %q", got)
+	}
+	if !strings.Contains(got, "✓") {
+		t.Errorf("PRSection: approved 마크 '✓' 누락 — got %q", got)
+	}
+}
+
+func TestPRSectionNil(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.PR = nil
+	s := &PRSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("PRSection(nil): 빈 문자열 기대, got %q", got)
+	}
+}
+
+func TestPRSectionNoReviewState(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.PR.ReviewState = ""
+	s := &PRSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "PR#1234") {
+		t.Errorf("PRSection(state 없음): 'PR#1234' 누락 — got %q", got)
+	}
+}
+
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
-	if len(sections) != 13 {
-		t.Errorf("AllSections: 13개 기대, got %d", len(sections))
+	if len(sections) != 14 {
+		t.Errorf("AllSections: 14개 기대, got %d", len(sections))
 	}
 }
 
