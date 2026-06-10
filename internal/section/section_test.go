@@ -261,10 +261,44 @@ func TestEffortSectionNil(t *testing.T) {
 	}
 }
 
+func TestSessionSection(t *testing.T) {
+	ctx := testContext(t)
+	// normal.json: session_name = "my-session"
+	s := &SessionSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "my-session") {
+		t.Errorf("SessionSection: 세션명 'my-session' 누락 — got %q", got)
+	}
+}
+
+func TestSessionSectionEmpty(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.SessionName = ""
+	s := &SessionSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("SessionSection(empty): 빈 문자열 기대, got %q", got)
+	}
+}
+
+func TestSessionSectionTruncate(t *testing.T) {
+	ctx := testContext(t)
+	// 실측: CC 2.1.170은 자동 생성된 긴 세션 제목을 session_name으로 보냄
+	ctx.Input.SessionName = "Claude 2.1.170 업데이트로 telemetry 고도화 검토"
+	s := &SessionSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "…") {
+		t.Errorf("SessionSection(long): 말줄임 '…' 누락 — got %q", got)
+	}
+	// [ + 내용 + ] 전체가 24컬럼 이하 (내용 최대 20 + 괄호 2 + 말줄임 1)
+	if w := render.DisplayWidth(got); w > 24 {
+		t.Errorf("SessionSection(long): 표시 폭 %d > 24", w)
+	}
+}
+
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
-	if len(sections) != 12 {
-		t.Errorf("AllSections: 12개 기대, got %d", len(sections))
+	if len(sections) != 13 {
+		t.Errorf("AllSections: 13개 기대, got %d", len(sections))
 	}
 }
 
