@@ -66,6 +66,9 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 - **Preset modes** — compact (1 line), normal (2 lines), detailed (3 lines)
 - **Auto user detection** — OAuth users see rate limits, API key users see cost
 - **Git integration** — folder:branch, ↑push/↓pull, changes (+/-), untracked (?N), stash (≡N), worktrees (⎇N)
+- **Effort level** — live reasoning effort (low/medium/high/xhigh/max) from the session, reflects `/effort` changes (Claude Code ≥ 2.1.141)
+- **PR badge** — open PR number and review state for the current branch, no `gh` CLI needed (Claude Code ≥ 2.1.145)
+- **Session name** — session title shown as `[name]`, auto-truncated to 20 columns
 - **Rate limit countdown** — remaining time until reset with progress bar
 - **Dynamic color thresholds** — green/yellow/red based on remaining %, customizable via config
 - **Graceful degradation** — loading (···), partial failure (—), error messages instead of silent blank
@@ -80,19 +83,25 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 
 | Line | Section | Description |
 |------|---------|-------------|
+| 1 | Session | `[name]` session title (shown only when set, max 20 cols) |
 | 1 | Model | Current model name |
+| 1 | Effort | ↯ reasoning effort level, color-coded (low→max) |
 | 1 | Elapsed | Session duration (Nh Nm format) |
 | 1 | Git | folder:branch ↑push ↓pull +add/-del ?untracked ≡stash ⎇worktrees |
+| 1 | PR | Open PR number + review state ✓/●/✗/◌ (shown only when a PR is open) |
 | 2 | Context | ◆ Remaining context window % with progress bar |
 | 2 | Remaining | ◆ 5h / 7d remaining % with reset countdown (OAuth, auto-detected) |
 | 2 | Cost | Session cost in USD (API key, auto-detected) |
 | 2 | Lines | Session lines added/removed |
 | 2 | API Duration | Time spent waiting for API responses |
-| 2 | Tokens | Input/output token details |
+| 2 | Tokens | Tokens currently in the context window (in/out) |
 | 3 | Agent | Active agent name (shown only when active) |
 | 3 | Vim | Vim mode indicator (shown only when active) |
+| 3 | Thinking | ✦ extended thinking indicator (shown only when enabled) |
 
-Line 3 appears only when agent or vim mode is active.
+Line 3 appears only when agent, vim mode, or thinking indicator is active.
+
+> **Note:** Since Claude Code 2.1.132, token counts reflect what is currently in the context window, not cumulative session totals.
 
 ## Setup
 
@@ -122,8 +131,8 @@ Or edit `~/.claude/statusline/config.json` directly:
 
 | Preset | Lines | Sections |
 |--------|-------|----------|
-| `compact` | 1 | Model, Context, Remaining |
-| `normal` | 2 | Model, Elapsed, Git, Context, Remaining/Cost, Agent, Vim |
+| `compact` | 1 | Model, Effort, Context, Remaining |
+| `normal` | 2 | Session, Model, Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
 | `detailed` | 3 | All sections enabled |
 
 ### Section overrides
@@ -176,6 +185,7 @@ If you don't run setup, the v1 jq-based rendering continues to work via the buil
 
 - Claude Code
 - `git` (optional, for branch/changes display)
+- Claude Code ≥ 2.1.141 for Effort, ≥ 2.1.145 for PR badge (older versions simply hide these sections)
 
 ## License
 
