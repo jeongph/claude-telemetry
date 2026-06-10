@@ -154,4 +154,3 @@ func ResolveLanguage(cfgLang, claudeDir string) string {
 		return "en"
 	}
 }
-
