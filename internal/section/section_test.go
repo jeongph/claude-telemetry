@@ -337,6 +337,29 @@ func TestPRSectionNoReviewState(t *testing.T) {
 	}
 }
 
+func TestPRSectionReviewStates(t *testing.T) {
+	tests := []struct {
+		state string
+		mark  string
+	}{
+		{"approved", "✓"},
+		{"pending", "●"},
+		{"changes_requested", "✗"},
+		{"draft", "◌"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.state, func(t *testing.T) {
+			ctx := testContext(t)
+			ctx.Input.PR.ReviewState = tc.state
+			s := &PRSection{}
+			got := s.Render(ctx)
+			if !strings.Contains(got, tc.mark) {
+				t.Errorf("PRSection(%s): 마크 %q 누락 — got %q", tc.state, tc.mark, got)
+			}
+		})
+	}
+}
+
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
 	if len(sections) != 14 {
