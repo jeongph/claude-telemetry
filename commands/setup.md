@@ -195,7 +195,7 @@ Note: Agent, Vim Mode, Effort, PR, and Session Name are always ON in Custom mode
 
 ## Step 6: Configure statusLine in settings.json
 
-1. Copy the launcher to a version-independent path (plugin cache paths change on every plugin update):
+1. ALWAYS copy the launcher first (run as a single Bash command, even if statusLine is already configured — this keeps the launcher up to date across plugin updates):
    ```bash
    mkdir -p ~/.claude/statusline
    cp "${CLAUDE_PLUGIN_ROOT}/scripts/run.sh" ~/.claude/statusline/run.sh
@@ -203,7 +203,7 @@ Note: Agent, Vim Mode, Effort, PR, and Session Name are always ON in Custom mode
 2. Read `~/.claude/settings.json`
 3. Check the `statusLine` field:
    - **Not present** → add it
-   - **Present and same script** → skip (tell user it's already configured)
+   - **Present and same script** → skip the settings.json edit only (tell user it's already configured; the copy in step 1 still runs)
    - **Present but different** (including old plugin-cache paths) → ask user with AskUserQuestion whether to replace
 4. The statusLine entry must be (resolve `<home>` to the absolute home directory):
 ```json
