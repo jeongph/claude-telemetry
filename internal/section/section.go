@@ -36,6 +36,7 @@ func AllSections() []LineSection {
 	return []LineSection{
 		// Line 1
 		{&ModelSection{}, 1},
+		{&EffortSection{}, 1},
 		{&ElapsedSection{}, 1},
 		{&GitSection{}, 1},
 		// Line 2

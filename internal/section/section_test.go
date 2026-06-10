@@ -239,10 +239,32 @@ func TestTokensSection(t *testing.T) {
 	}
 }
 
+func TestEffortSection(t *testing.T) {
+	ctx := testContext(t)
+	// normal.json: effort.level = "high"
+	s := &EffortSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "↯") {
+		t.Errorf("EffortSection: '↯' 누락 — got %q", got)
+	}
+	if !strings.Contains(got, "high") {
+		t.Errorf("EffortSection: 레벨 'high' 누락 — got %q", got)
+	}
+}
+
+func TestEffortSectionNil(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.Effort = nil
+	s := &EffortSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("EffortSection(nil): 빈 문자열 기대, got %q", got)
+	}
+}
+
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
-	if len(sections) != 11 {
-		t.Errorf("AllSections: 11개 기대, got %d", len(sections))
+	if len(sections) != 12 {
+		t.Errorf("AllSections: 12개 기대, got %d", len(sections))
 	}
 }
 
