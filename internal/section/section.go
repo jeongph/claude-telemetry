@@ -15,7 +15,6 @@ type Context struct {
 	Locale  i18n.Locale
 	Colors  render.Colors
 	GitInfo *gitinfo.GitInfo
-	Effort  string // from settings.json
 }
 
 // Section is the interface that all status-line sections implement.
