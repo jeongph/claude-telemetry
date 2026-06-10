@@ -295,6 +295,16 @@ func TestSessionSectionTruncate(t *testing.T) {
 	}
 }
 
+func TestSessionSectionExactWidth(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.SessionName = "12345678901234567890" // 20 ASCII = 20컬럼, 절단 불필요
+	s := &SessionSection{}
+	got := s.Render(ctx)
+	if strings.Contains(got, "…") {
+		t.Errorf("SessionSection(exact20): 절단되면 안 됨 — got %q", got)
+	}
+}
+
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
 	if len(sections) != 13 {
