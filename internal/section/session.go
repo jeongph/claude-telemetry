@@ -28,6 +28,8 @@ func (s *SessionSection) Render(ctx *Context) string {
 
 // truncateDisplay는 표시 폭 기준으로 문자열을 자르고 말줄임표를 붙인다.
 // 한글 등 와이드 문자는 2컬럼으로 계산된다.
+// XXX: 2026-06-10 이모지·전각 라틴은 render.DisplayWidth가 1컬럼으로 계산하므로
+// 포함 시 절단 위치가 다소 밀릴 수 있다 (표시가 깨지지는 않음).
 func truncateDisplay(s string, max int) string {
 	if render.DisplayWidth(s) <= max {
 		return s
