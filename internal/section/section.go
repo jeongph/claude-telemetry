@@ -51,5 +51,6 @@ func AllSections() []LineSection {
 		// Line 3
 		{&AgentSection{}, 3},
 		{&VimSection{}, 3},
+		{&ThinkingSection{}, 3},
 	}
 }
