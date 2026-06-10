@@ -155,18 +155,3 @@ func ResolveLanguage(cfgLang, claudeDir string) string {
 	}
 }
 
-// ReadEffortLevel reads the effortLevel from ~/.claude/settings.json.
-func ReadEffortLevel(claudeDir string) string {
-	data, err := os.ReadFile(filepath.Join(claudeDir, "settings.json"))
-	if err != nil {
-		return "auto"
-	}
-	var s struct {
-		EffortLevel string `json:"effortLevel"`
-	}
-	json.Unmarshal(data, &s) //nolint:errcheck
-	if s.EffortLevel == "" {
-		return "auto"
-	}
-	return s.EffortLevel
-}

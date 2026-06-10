@@ -29,7 +29,6 @@ func testContext(t *testing.T) *Context {
 		Locale:  i18n.New("en"),
 		Colors:  render.NewColors(false), // no color for assertion
 		GitInfo: &gitinfo.GitInfo{IsRepo: true, Branch: "main", Ahead: 1, Added: 5, Deleted: 2},
-		Effort:  "high",
 	}
 }
 
