@@ -281,6 +281,9 @@ func TestParseNewFields(t *testing.T) {
 	if inp.PR.ReviewState != "approved" {
 		t.Errorf("PR.ReviewState = %q, want %q", inp.PR.ReviewState, "approved")
 	}
+	if inp.PR.URL != "https://github.com/jeongph/claude-telemetry/pull/1234" {
+		t.Errorf("PR.URL = %q, want %q", inp.PR.URL, "https://github.com/jeongph/claude-telemetry/pull/1234")
+	}
 }
 
 func TestParseCurrentUsage(t *testing.T) {
