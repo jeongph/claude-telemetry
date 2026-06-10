@@ -131,7 +131,7 @@ Or edit `~/.claude/statusline/config.json` directly:
 
 | Preset | Lines | Sections |
 |--------|-------|----------|
-| `compact` | 1 | Model, Effort, Context, Remaining |
+| `compact` | 1 | Model, Effort, Context, Remaining/Cost |
 | `normal` | 2 | Session, Model, Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
 | `detailed` | 3 | All sections enabled |
 
