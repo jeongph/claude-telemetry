@@ -12,6 +12,7 @@ PLUGIN_VER=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "
 [ -n "$PLUGIN_VER" ] || exit 0
 
 BIN_VER=$("$BIN" --version 2>/dev/null | sed 's/^claude-telemetry v\{0,1\}//')
+[ -n "$BIN_VER" ] || exit 0
 [ "$BIN_VER" = "dev" ] && exit 0
 [ "$BIN_VER" = "$PLUGIN_VER" ] && exit 0
 
@@ -29,10 +30,11 @@ mkdir "$LOCK" 2>/dev/null || exit 0
     case "$ARCH" in
         x86_64) ARCH="amd64" ;;
         aarch64|arm64) ARCH="arm64" ;;
+        *) exit 0 ;;
     esac
     NAME="claude-telemetry-${OS}-${ARCH}"
     BASE="https://github.com/jeongph/claude-telemetry/releases/download/v${PLUGIN_VER}"
-    TMP=$(mktemp) || exit 0
+    TMP=$(mktemp -p "$(dirname "$BIN")") || exit 0
     if curl -fsSL --max-time 60 "${BASE}/${NAME}" -o "$TMP"; then
         SUM=$(curl -fsSL --max-time 15 "${BASE}/checksums.txt" | awk -v n="$NAME" '$2 == n {print $1}')
         if command -v sha256sum >/dev/null 2>&1; then
