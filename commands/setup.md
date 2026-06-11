@@ -47,9 +47,10 @@ Map the selection: "English" → en, "한국어" → ko, "日本語" → ja, "�
 Run this EXACT script as a single Bash command. Do NOT split it into multiple commands:
 
 ```bash
-EXISTING_VER=$(~/.claude/statusline/bin/claude-telemetry --version 2>/dev/null)
-if [ -n "$EXISTING_VER" ]; then
-  echo "INSTALLED: $EXISTING_VER"
+PLUGIN_VER=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json" | head -1)
+EXISTING_VER=$(~/.claude/statusline/bin/claude-telemetry --version 2>/dev/null | sed 's/^claude-telemetry v\{0,1\}//')
+if [ "$EXISTING_VER" = "$PLUGIN_VER" ]; then
+  echo "UP_TO_DATE: v$EXISTING_VER"
 else
   OS=$(uname -s | tr '[:upper:]' '[:lower:]')
   ARCH=$(uname -m)
@@ -57,19 +58,30 @@ else
     x86_64) ARCH="amd64" ;;
     aarch64|arm64) ARCH="arm64" ;;
   esac
+  NAME="claude-telemetry-${OS}-${ARCH}"
+  BASE="https://github.com/jeongph/claude-telemetry/releases/download/v${PLUGIN_VER}"
   mkdir -p ~/.claude/statusline/bin
-  URL="https://github.com/jeongph/claude-telemetry/releases/latest/download/claude-telemetry-${OS}-${ARCH}"
-  echo "Downloading: $URL"
-  curl -fsSL "$URL" -o ~/.claude/statusline/bin/claude-telemetry && \
-  chmod +x ~/.claude/statusline/bin/claude-telemetry && \
-  ~/.claude/statusline/bin/claude-telemetry --version && \
-  echo "SUCCESS" || echo "DOWNLOAD_FAILED"
+  TMP=$(mktemp -p ~/.claude/statusline/bin)
+  echo "Downloading: ${BASE}/${NAME}"
+  if curl -fsSL "${BASE}/${NAME}" -o "$TMP"; then
+    SUM=$(curl -fsSL "${BASE}/checksums.txt" | awk -v n="$NAME" '$2 == n {print $1}')
+    if command -v sha256sum >/dev/null 2>&1; then ACTUAL=$(sha256sum "$TMP" | awk '{print $1}'); else ACTUAL=$(shasum -a 256 "$TMP" | awk '{print $1}'); fi
+    if [ -n "$SUM" ] && [ "$ACTUAL" = "$SUM" ]; then
+      chmod +x "$TMP" && mv -f "$TMP" ~/.claude/statusline/bin/claude-telemetry && \
+      ~/.claude/statusline/bin/claude-telemetry --version && echo "SUCCESS"
+    else
+      rm -f "$TMP"; echo "CHECKSUM_FAILED"
+    fi
+  else
+    rm -f "$TMP"; echo "DOWNLOAD_FAILED"
+  fi
 fi
 ```
 
 Handle the output:
-- If `INSTALLED: ...` → show the version to the user, ask if they want to update. If yes, re-run the script with the download portion (remove the version check). If no, skip to Step 3.
+- If `UP_TO_DATE: ...` → inform user the binary is already at the current version, proceed to Step 3
 - If `SUCCESS` → proceed to Step 3
+- If `CHECKSUM_FAILED` → inform user the checksum verification failed and stop
 - If `DOWNLOAD_FAILED` → inform user the download failed and stop
 
 ---
@@ -199,7 +211,9 @@ Note: Agent, Vim Mode, Effort, and PR are always ON in Custom mode (they only ap
    ```bash
    mkdir -p ~/.claude/statusline
    cp "${CLAUDE_PLUGIN_ROOT}/scripts/run.sh" ~/.claude/statusline/run.sh
+   touch ~/.claude/statusline/.managed-by-plugin
    ```
+   (the marker file enables automatic cleanup when the plugin is uninstalled)
 2. Read `~/.claude/settings.json`
 3. Check the `statusLine` field:
    - **Not present** → add it
@@ -227,6 +241,7 @@ Line 2: ◆ Context ▰▰▰▱▱ 55% │ ◆ Remaining 5h ▰▰▰▰▱ 70%
 Line 3: ▶ code-explorer │ NORMAL
 
 Restart Claude Code to apply.
+From now on the binary stays in sync with the plugin automatically (checked at session start).
 ```
 
 - Only show sections the user enabled
