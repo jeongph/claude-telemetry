@@ -2,14 +2,14 @@ package section
 
 import "github.com/jeongph/claude-telemetry/internal/render"
 
-// EffortSection displays the reasoning effort level (Line 1, Priority 3).
+// renderEffort는 reasoning effort 레벨을 ↯<level> 형태로 렌더링한다.
 // Claude Code 2.1.141+ 의 effort.level 입력을 사용한다 (라이브 세션 값).
-type EffortSection struct{}
-
-func (s *EffortSection) Name() string  { return "effort" }
-func (s *EffortSection) Priority() int { return 3 }
-
-func (s *EffortSection) Render(ctx *Context) string {
+// ModelSection이 모델명 옆에 붙여 표시하며, "effort" 섹션 키가 꺼져 있거나
+// 입력에 effort가 없으면(미지원 모델) 빈 문자열을 반환한다.
+func renderEffort(ctx *Context) string {
+	if !ctx.Config.IsSectionEnabled("effort") {
+		return ""
+	}
 	eff := ctx.Input.Effort
 	if eff == nil || eff.Level == "" {
 		return ""
@@ -33,8 +33,4 @@ func effortColor(c render.Colors, level string) func(string) string {
 	default:
 		return c.White
 	}
-}
-
-func (s *EffortSection) Width(ctx *Context) int {
-	return render.DisplayWidth(s.Render(ctx))
 }

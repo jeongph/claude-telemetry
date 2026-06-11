@@ -66,7 +66,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 - **Preset modes** — compact (1 line), normal (2 lines), detailed (3 lines)
 - **Auto user detection** — OAuth users see rate limits, API key users see cost
 - **Git integration** — folder:branch, ↑push/↓pull, changes (+/-), untracked (?N), stash (≡N), worktrees (⎇N)
-- **Effort level** — live reasoning effort (low/medium/high/xhigh/max) from the session, reflects `/effort` changes (Claude Code ≥ 2.1.141)
+- **Effort level** — live reasoning effort (low/medium/high/xhigh/max) shown beside the model name, reflects `/effort` changes (Claude Code ≥ 2.1.141)
 - **PR badge** — open PR number and review state for the current branch, no `gh` CLI needed (Claude Code ≥ 2.1.145)
 - **Session name** — session title shown as `[name]`, auto-truncated to 20 columns (off by default — Claude Code already shows the title in its UI; enable via `sections` or the detailed preset)
 - **Rate limit countdown** — remaining time until reset with progress bar
@@ -84,8 +84,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 | Line | Section | Description |
 |------|---------|-------------|
 | 1 | Session | `[name]` session title (max 20 cols, detailed preset or opt-in) |
-| 1 | Model | Current model name |
-| 1 | Effort | ↯ reasoning effort level, color-coded (low→max) |
+| 1 | Model | Model name with ↯ effort level beside it, color-coded low→max (toggle via `effort` key) |
 | 1 | Elapsed | Session duration (Nh Nm format) |
 | 1 | Git | folder:branch ↑push ↓pull +add/-del ?untracked ≡stash ⎇worktrees |
 | 1 | PR | Open PR number + review state ✓/●/✗/◌ (shown only when a PR is open) |
@@ -131,8 +130,8 @@ Or edit `~/.claude/statusline/config.json` directly:
 
 | Preset | Lines | Sections |
 |--------|-------|----------|
-| `compact` | 1 | Model, Effort, Context, Remaining/Cost |
-| `normal` | 2 | Model, Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
+| `compact` | 1 | Model ↯Effort, Context, Remaining/Cost |
+| `normal` | 2 | Model ↯Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
 | `detailed` | 3 | All sections enabled |
 
 ### Section overrides
