@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func writeFile(t *testing.T, path, content string) {
@@ -137,6 +138,29 @@ func TestRunWithLock(t *testing.T) {
 	data, _ := os.ReadFile(settings)
 	if !strings.Contains(string(data), "statusLine") {
 		t.Error("락 존재 시 settings를 건드리면 안 됨")
+	}
+}
+
+func TestRunStaleLockRecovery(t *testing.T) {
+	claudeDir := t.TempDir()
+	slDir := filepath.Join(claudeDir, "statusline")
+	os.MkdirAll(slDir, 0o755)
+	settings := filepath.Join(claudeDir, "settings.json")
+	writeFile(t, settings, `{"statusLine": {"type": "command"}}`)
+	// 11분 전 mtime의 stale 락 → 회수 후 정리 수행되어야 함
+	lock := filepath.Join(slDir, ".uninstall.lock")
+	writeFile(t, lock, "")
+	old := time.Now().Add(-11 * time.Minute)
+	if err := os.Chtimes(lock, old, old); err != nil {
+		t.Fatalf("Chtimes 실패: %v", err)
+	}
+
+	if err := Run(claudeDir, slDir); err != nil {
+		t.Fatalf("stale 락 회수 후 정리가 수행되어야 함: %v", err)
+	}
+	data, _ := os.ReadFile(settings)
+	if strings.Contains(string(data), "statusLine") {
+		t.Error("stale 락 회수 후 statusLine이 제거되어야 함")
 	}
 }
 

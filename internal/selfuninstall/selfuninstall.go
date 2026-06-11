@@ -9,7 +9,28 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"time"
 )
+
+// staleLockAge 이상 된 락은 비정상 종료의 잔재로 보고 회수한다.
+// run.sh가 매 렌더링마다 재시도하므로 이 회수가 자가 복구를 보장한다.
+const staleLockAge = 10 * time.Minute
+
+func acquireLock(lock string) bool {
+	f, err := os.OpenFile(lock, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+	if err == nil {
+		f.Close()
+		return true
+	}
+	if fi, statErr := os.Stat(lock); statErr == nil && time.Since(fi.ModTime()) > staleLockAge {
+		os.Remove(lock)
+		if f, err := os.OpenFile(lock, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600); err == nil {
+			f.Close()
+			return true
+		}
+	}
+	return false
+}
 
 // runShStub은 정리 후 run.sh에 남기는 무해화 스텁이다.
 // 현재 떠 있는 세션이 statusline 명령을 계속 호출하므로 빈 출력으로 응답해야 한다.
@@ -81,13 +102,12 @@ func CleanupFiles(statuslineDir string) error {
 
 // Run은 self-uninstall 전체 절차를 수행한다.
 // 락 파일(O_EXCL)로 동시 실행을 방지하며, 락 선점 실패는 에러가 아니다 (이미 진행 중).
+// staleLockAge 이상 된 락은 비정상 종료 잔재로 보고 회수 후 재시도한다.
 func Run(claudeDir, statuslineDir string) error {
 	lock := filepath.Join(statuslineDir, ".uninstall.lock")
-	f, err := os.OpenFile(lock, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
-	if err != nil {
+	if !acquireLock(lock) {
 		return nil
 	}
-	f.Close()
 
 	if err := RemoveStatusLine(filepath.Join(claudeDir, "settings.json")); err != nil {
 		os.Remove(lock)
