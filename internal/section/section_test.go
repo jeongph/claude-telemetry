@@ -34,14 +34,14 @@ func testContext(t *testing.T) *Context {
 
 func TestModelSection(t *testing.T) {
 	ctx := testContext(t)
-	// normal.json: effort.level = "high" → 모델명 옆에 ↯high 표시
+	// normal.json: effort.level = "high" → 모델명 옆에 "· high" 표시
 	s := &ModelSection{}
 	got := s.Render(ctx)
 	if !strings.Contains(got, "Opus") {
 		t.Errorf("ModelSection: 모델명 'Opus' 누락 — got %q", got)
 	}
-	if !strings.Contains(got, "↯high") {
-		t.Errorf("ModelSection: effort '↯high' 누락 — got %q", got)
+	if !strings.Contains(got, "· high") {
+		t.Errorf("ModelSection: effort '· high' 누락 — got %q", got)
 	}
 }
 
@@ -249,8 +249,8 @@ func TestModelSectionEffortNil(t *testing.T) {
 	if !strings.Contains(got, "Opus") {
 		t.Errorf("ModelSection(effort nil): 모델명 'Opus' 누락 — got %q", got)
 	}
-	if strings.Contains(got, "↯") {
-		t.Errorf("ModelSection(effort nil): '↯'가 없어야 함 — got %q", got)
+	if strings.Contains(got, "·") {
+		t.Errorf("ModelSection(effort nil): '·'가 없어야 함 — got %q", got)
 	}
 }
 
@@ -263,8 +263,8 @@ func TestModelSectionEffortDisabled(t *testing.T) {
 	if !strings.Contains(got, "Opus") {
 		t.Errorf("ModelSection(effort off): 모델명 'Opus' 누락 — got %q", got)
 	}
-	if strings.Contains(got, "↯") {
-		t.Errorf("ModelSection(effort off): '↯'가 없어야 함 — got %q", got)
+	if strings.Contains(got, "·") {
+		t.Errorf("ModelSection(effort off): '·'가 없어야 함 — got %q", got)
 	}
 }
 
