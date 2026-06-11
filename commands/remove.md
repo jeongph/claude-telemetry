@@ -60,21 +60,23 @@ Based on user choice:
 
 ### "Remove all"
 
-1. Remove the Go binary:
+1. Run the tested cleanup path in the binary (removes statusLine from settings.json with backup, deletes config/binary/marker, neutralizes run.sh):
    ```bash
-   rm -f ~/.claude/statusline/bin/claude-telemetry
+   ~/.claude/statusline/bin/claude-telemetry --self-uninstall && echo "CLEANED" || echo "FALLBACK"
    ```
-2. Remove the full statusline directory (config, cache, bin):
-   ```bash
-   rm -rf ~/.claude/statusline/
-   ```
-3. Read `~/.claude/settings.json`
-4. Remove the `"statusLine"` entry from the JSON using Edit tool
-5. Verify settings.json is still valid JSON:
-   ```bash
-   python3 -c "import json; json.load(open('$HOME/.claude/settings.json'))" 2>/dev/null || echo "INVALID"
-   ```
-   If invalid, warn the user and suggest manual fix.
+2. If `CLEANED` → proceed to Step 4. A backup was saved at `~/.claude/settings.json.claude-telemetry.bak`.
+3. If `FALLBACK` (binary missing or failed) → do it manually:
+   1. Remove files:
+      ```bash
+      rm -rf ~/.claude/statusline/
+      ```
+   2. Read `~/.claude/settings.json`
+   3. Remove the `"statusLine"` entry from the JSON using Edit tool
+   4. Verify settings.json is still valid JSON:
+      ```bash
+      python3 -c "import json; json.load(open('$HOME/.claude/settings.json'))" 2>/dev/null || echo "INVALID"
+      ```
+      If invalid, warn the user and suggest manual fix.
 
 ### "Config only"
 
@@ -94,6 +96,8 @@ Status line configuration has been removed. Restart Claude Code to apply.
 
 To set up again: /claude-telemetry:setup
 ```
+
+A harmless stub may remain at ~/.claude/statusline/run.sh — you can delete the directory after restarting.
 
 ---
 
