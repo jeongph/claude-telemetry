@@ -1,0 +1,17 @@
+{
+  "description": "플러그인-바이너리 버전 자동 동기화 (세션 시작 시)",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/sync-binary.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
