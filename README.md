@@ -75,6 +75,8 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 - **Progress bars** — ▰▱ visualization, color-coded green → yellow → red
 - **Adaptive width** — auto-drops lower priority sections on narrow terminals
 - **i18n** — English, Korean, Japanese, Chinese (auto-detected)
+- **Auto binary sync** — a SessionStart hook keeps the binary matched to the plugin version (pinned download + sha256 verification)
+- **Self-cleanup on uninstall** — if you uninstall the plugin, the status line removes its own settings entry and files within a minute (setup-managed installs only)
 - **NO_COLOR support** — respects `NO_COLOR` environment variable
 - **Go binary** — single binary, no runtime dependencies, sub-10ms rendering
 - **v1 fallback** — existing jq-based users keep working until they upgrade
@@ -173,6 +175,14 @@ Create `.claude-statusline.json` in your project root to override global setting
 ```
 /claude-telemetry:remove
 ```
+
+If you uninstall the plugin without running remove first, the status line detects the missing plugin and cleans itself up automatically within about a minute (settings entry removed from the next session). This applies to installs managed by `/claude-telemetry:setup`; manual installs are never touched.
+
+## Upgrading
+
+- **Plugin users (v2.4.0+):** update the plugin (`/plugin` → Update), then restart Claude Code. The SessionStart hook syncs the binary to the plugin version automatically.
+- **Plugin users (older):** run `/claude-telemetry:setup` once after updating the plugin — it downloads the matching binary and migrates your settings to the version-independent launcher path.
+- **Manual installs:** re-run the curl command from Manual setup; the binary is all that matters.
 
 ## Upgrading from v1
 
