@@ -34,13 +34,14 @@ func testContext(t *testing.T) *Context {
 
 func TestModelSection(t *testing.T) {
 	ctx := testContext(t)
+	// normal.json: effort.level = "high" → 모델명 옆에 ↯high 표시
 	s := &ModelSection{}
 	got := s.Render(ctx)
 	if !strings.Contains(got, "Opus") {
 		t.Errorf("ModelSection: 모델명 'Opus' 누락 — got %q", got)
 	}
-	if strings.Contains(got, "high") {
-		t.Errorf("ModelSection: effort는 표시하지 않아야 함 — got %q", got)
+	if !strings.Contains(got, "↯high") {
+		t.Errorf("ModelSection: effort '↯high' 누락 — got %q", got)
 	}
 }
 
@@ -239,25 +240,31 @@ func TestTokensSection(t *testing.T) {
 	}
 }
 
-func TestEffortSection(t *testing.T) {
+func TestModelSectionEffortNil(t *testing.T) {
 	ctx := testContext(t)
-	// normal.json: effort.level = "high"
-	s := &EffortSection{}
+	// effort 미지원 모델(필드 absent) → 모델명만 표시
+	ctx.Input.Effort = nil
+	s := &ModelSection{}
 	got := s.Render(ctx)
-	if !strings.Contains(got, "↯") {
-		t.Errorf("EffortSection: '↯' 누락 — got %q", got)
+	if !strings.Contains(got, "Opus") {
+		t.Errorf("ModelSection(effort nil): 모델명 'Opus' 누락 — got %q", got)
 	}
-	if !strings.Contains(got, "high") {
-		t.Errorf("EffortSection: 레벨 'high' 누락 — got %q", got)
+	if strings.Contains(got, "↯") {
+		t.Errorf("ModelSection(effort nil): '↯'가 없어야 함 — got %q", got)
 	}
 }
 
-func TestEffortSectionNil(t *testing.T) {
+func TestModelSectionEffortDisabled(t *testing.T) {
 	ctx := testContext(t)
-	ctx.Input.Effort = nil
-	s := &EffortSection{}
-	if got := s.Render(ctx); got != "" {
-		t.Errorf("EffortSection(nil): 빈 문자열 기대, got %q", got)
+	// sections override로 effort를 끄면 모델명만 표시
+	ctx.Config.Sections = map[string]bool{"effort": false}
+	s := &ModelSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "Opus") {
+		t.Errorf("ModelSection(effort off): 모델명 'Opus' 누락 — got %q", got)
+	}
+	if strings.Contains(got, "↯") {
+		t.Errorf("ModelSection(effort off): '↯'가 없어야 함 — got %q", got)
 	}
 }
 
@@ -390,8 +397,8 @@ func TestThinkingSectionNil(t *testing.T) {
 
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
-	if len(sections) != 15 {
-		t.Errorf("AllSections: 15개 기대, got %d", len(sections))
+	if len(sections) != 14 {
+		t.Errorf("AllSections: 14개 기대, got %d", len(sections))
 	}
 }
 
