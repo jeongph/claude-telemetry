@@ -64,30 +64,26 @@ func main() {
 	// 5. Setup colors
 	colors := render.NewColors(cfg.Colors())
 
-	// 6. Read effort level
-	effort := config.ReadEffortLevel(claudeDir)
-
-	// 7. Gather git info
+	// 6. Gather git info
 	cwd := inp.CWD
 	if cwd == "" {
 		cwd = "."
 	}
 	gitInfo := gitinfo.Gather(cwd, "")
 
-	// 8. Get terminal width
+	// 7. Get terminal width
 	cols := getTerminalWidth()
 
-	// 9. Build section context
+	// 8. Build section context
 	ctx := &section.Context{
 		Input:   inp,
 		Config:  cfg,
 		Locale:  locale,
 		Colors:  colors,
 		GitInfo: gitInfo,
-		Effort:  effort,
 	}
 
-	// 10. Render sections per line
+	// 9. Render sections per line
 	allSections := section.AllSections()
 	var line1Parts []string
 	var line2Segments []render.ScoredSegment
@@ -119,7 +115,7 @@ func main() {
 		}
 	}
 
-	// 11. Assemble and output
+	// 10. Assemble and output
 	compact := cfg.Preset == "compact"
 	sep := cfg.Separator
 	lines := render.AssembleLines(line1Parts, line2Segments, line3Parts, sep, cols, compact)

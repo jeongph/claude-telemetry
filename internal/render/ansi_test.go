@@ -35,8 +35,8 @@ func TestDisplayWidth(t *testing.T) {
 		want  int
 	}{
 		{"hello", 5},
-		{"컨텍스트", 8},              // 4 Korean chars x 2
-		{"a한b", 4},               // 1 + 2 + 1
+		{"컨텍스트", 8},                  // 4 Korean chars x 2
+		{"a한b", 4},                   // 1 + 2 + 1
 		{"\033[1;36mtest\033[0m", 4}, // ANSI stripped
 		{"", 0},
 	}

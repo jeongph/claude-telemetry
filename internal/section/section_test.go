@@ -29,19 +29,19 @@ func testContext(t *testing.T) *Context {
 		Locale:  i18n.New("en"),
 		Colors:  render.NewColors(false), // no color for assertion
 		GitInfo: &gitinfo.GitInfo{IsRepo: true, Branch: "main", Ahead: 1, Added: 5, Deleted: 2},
-		Effort:  "high",
 	}
 }
 
 func TestModelSection(t *testing.T) {
 	ctx := testContext(t)
+	// normal.json: effort.level = "high" → 모델명 옆에 "· high" 표시
 	s := &ModelSection{}
 	got := s.Render(ctx)
 	if !strings.Contains(got, "Opus") {
 		t.Errorf("ModelSection: 모델명 'Opus' 누락 — got %q", got)
 	}
-	if strings.Contains(got, "high") {
-		t.Errorf("ModelSection: effort는 표시하지 않아야 함 — got %q", got)
+	if !strings.Contains(got, "· high") {
+		t.Errorf("ModelSection: effort '· high' 누락 — got %q", got)
 	}
 }
 
@@ -240,10 +240,165 @@ func TestTokensSection(t *testing.T) {
 	}
 }
 
+func TestModelSectionEffortNil(t *testing.T) {
+	ctx := testContext(t)
+	// effort 미지원 모델(필드 absent) → 모델명만 표시
+	ctx.Input.Effort = nil
+	s := &ModelSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "Opus") {
+		t.Errorf("ModelSection(effort nil): 모델명 'Opus' 누락 — got %q", got)
+	}
+	if strings.Contains(got, "·") {
+		t.Errorf("ModelSection(effort nil): '·'가 없어야 함 — got %q", got)
+	}
+}
+
+func TestModelSectionEffortDisabled(t *testing.T) {
+	ctx := testContext(t)
+	// sections override로 effort를 끄면 모델명만 표시
+	ctx.Config.Sections = map[string]bool{"effort": false}
+	s := &ModelSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "Opus") {
+		t.Errorf("ModelSection(effort off): 모델명 'Opus' 누락 — got %q", got)
+	}
+	if strings.Contains(got, "·") {
+		t.Errorf("ModelSection(effort off): '·'가 없어야 함 — got %q", got)
+	}
+}
+
+func TestSessionSection(t *testing.T) {
+	ctx := testContext(t)
+	// normal.json: session_name = "my-session"
+	s := &SessionSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "my-session") {
+		t.Errorf("SessionSection: 세션명 'my-session' 누락 — got %q", got)
+	}
+}
+
+func TestSessionSectionEmpty(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.SessionName = ""
+	s := &SessionSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("SessionSection(empty): 빈 문자열 기대, got %q", got)
+	}
+}
+
+func TestSessionSectionTruncate(t *testing.T) {
+	ctx := testContext(t)
+	// 실측: CC 2.1.170은 자동 생성된 긴 세션 제목을 session_name으로 보냄
+	ctx.Input.SessionName = "Claude 2.1.170 업데이트로 telemetry 고도화 검토"
+	s := &SessionSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "…") {
+		t.Errorf("SessionSection(long): 말줄임 '…' 누락 — got %q", got)
+	}
+	// [ + 내용 + ] 전체가 24컬럼 이하 (내용 최대 20 + 괄호 2 + 말줄임 1)
+	if w := render.DisplayWidth(got); w > 24 {
+		t.Errorf("SessionSection(long): 표시 폭 %d > 24", w)
+	}
+}
+
+func TestSessionSectionExactWidth(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.SessionName = "12345678901234567890" // 20 ASCII = 20컬럼, 절단 불필요
+	s := &SessionSection{}
+	got := s.Render(ctx)
+	if strings.Contains(got, "…") {
+		t.Errorf("SessionSection(exact20): 절단되면 안 됨 — got %q", got)
+	}
+}
+
+func TestPRSection(t *testing.T) {
+	ctx := testContext(t)
+	// normal.json: pr.number = 1234, review_state = "approved"
+	s := &PRSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "PR#1234") {
+		t.Errorf("PRSection: 'PR#1234' 누락 — got %q", got)
+	}
+	if !strings.Contains(got, "✓") {
+		t.Errorf("PRSection: approved 마크 '✓' 누락 — got %q", got)
+	}
+}
+
+func TestPRSectionNil(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.PR = nil
+	s := &PRSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("PRSection(nil): 빈 문자열 기대, got %q", got)
+	}
+}
+
+func TestPRSectionNoReviewState(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.PR.ReviewState = ""
+	s := &PRSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "PR#1234") {
+		t.Errorf("PRSection(state 없음): 'PR#1234' 누락 — got %q", got)
+	}
+}
+
+func TestPRSectionReviewStates(t *testing.T) {
+	tests := []struct {
+		state string
+		mark  string
+	}{
+		{"approved", "✓"},
+		{"pending", "●"},
+		{"changes_requested", "✗"},
+		{"draft", "◌"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.state, func(t *testing.T) {
+			ctx := testContext(t)
+			ctx.Input.PR.ReviewState = tc.state
+			s := &PRSection{}
+			got := s.Render(ctx)
+			if !strings.Contains(got, tc.mark) {
+				t.Errorf("PRSection(%s): 마크 %q 누락 — got %q", tc.state, tc.mark, got)
+			}
+		})
+	}
+}
+
+func TestThinkingSection(t *testing.T) {
+	ctx := testContext(t)
+	// normal.json: thinking.enabled = true
+	s := &ThinkingSection{}
+	got := s.Render(ctx)
+	if !strings.Contains(got, "✦") {
+		t.Errorf("ThinkingSection: '✦' 누락 — got %q", got)
+	}
+}
+
+func TestThinkingSectionDisabled(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.Thinking = &input.Thinking{Enabled: false}
+	s := &ThinkingSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("ThinkingSection(disabled): 빈 문자열 기대, got %q", got)
+	}
+}
+
+func TestThinkingSectionNil(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Input.Thinking = nil
+	s := &ThinkingSection{}
+	if got := s.Render(ctx); got != "" {
+		t.Errorf("ThinkingSection(nil): 빈 문자열 기대, got %q", got)
+	}
+}
+
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
-	if len(sections) != 11 {
-		t.Errorf("AllSections: 11개 기대, got %d", len(sections))
+	if len(sections) != 14 {
+		t.Errorf("AllSections: 14개 기대, got %d", len(sections))
 	}
 }
 

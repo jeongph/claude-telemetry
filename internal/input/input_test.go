@@ -41,8 +41,8 @@ func TestParseNormalInput(t *testing.T) {
 	if inp.TranscriptPath != "/tmp/transcript.jsonl" {
 		t.Errorf("TranscriptPath = %q, want %q", inp.TranscriptPath, "/tmp/transcript.jsonl")
 	}
-	if inp.Version != "1.0.80" {
-		t.Errorf("Version = %q, want %q", inp.Version, "1.0.80")
+	if inp.Version != "2.1.170" {
+		t.Errorf("Version = %q, want %q", inp.Version, "2.1.170")
 	}
 
 	// Model (object 형태)
@@ -219,6 +219,18 @@ func TestParseMinimalInput(t *testing.T) {
 	if inp.Worktree != nil {
 		t.Error("Worktree가 nil이어야 함")
 	}
+	if inp.Effort != nil {
+		t.Error("Effort가 nil이어야 함")
+	}
+	if inp.Thinking != nil {
+		t.Error("Thinking이 nil이어야 함")
+	}
+	if inp.PR != nil {
+		t.Error("PR이 nil이어야 함")
+	}
+	if inp.SessionName != "" {
+		t.Error("SessionName이 빈 문자열이어야 함")
+	}
 }
 
 func TestParseInvalidJSON(t *testing.T) {
@@ -232,6 +244,45 @@ func TestParseEmptyInput(t *testing.T) {
 	_, err := input.Parse([]byte{})
 	if err == nil {
 		t.Error("빈 입력에서 에러가 반환되어야 함")
+	}
+}
+
+func TestParseNewFields(t *testing.T) {
+	data := readTestdata(t, "normal.json")
+	inp, err := input.Parse(data)
+	if err != nil {
+		t.Fatalf("Parse 실패: %v", err)
+	}
+
+	if inp.SessionName != "my-session" {
+		t.Errorf("SessionName = %q, want %q", inp.SessionName, "my-session")
+	}
+
+	if inp.Effort == nil {
+		t.Fatal("Effort가 nil이면 안 됨")
+	}
+	if inp.Effort.Level != "high" {
+		t.Errorf("Effort.Level = %q, want %q", inp.Effort.Level, "high")
+	}
+
+	if inp.Thinking == nil {
+		t.Fatal("Thinking이 nil이면 안 됨")
+	}
+	if !inp.Thinking.Enabled {
+		t.Error("Thinking.Enabled = false, want true")
+	}
+
+	if inp.PR == nil {
+		t.Fatal("PR이 nil이면 안 됨")
+	}
+	if inp.PR.Number != 1234 {
+		t.Errorf("PR.Number = %v, want 1234", inp.PR.Number)
+	}
+	if inp.PR.ReviewState != "approved" {
+		t.Errorf("PR.ReviewState = %q, want %q", inp.PR.ReviewState, "approved")
+	}
+	if inp.PR.URL != "https://github.com/jeongph/claude-telemetry/pull/1234" {
+		t.Errorf("PR.URL = %q, want %q", inp.PR.URL, "https://github.com/jeongph/claude-telemetry/pull/1234")
 	}
 }
 

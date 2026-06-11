@@ -9,18 +9,22 @@ import (
 type Input struct {
 	CWD            string          `json:"cwd"`
 	SessionID      string          `json:"session_id"`
+	SessionName    string          `json:"session_name"`
 	TranscriptPath string          `json:"transcript_path"`
 	Version        string          `json:"version"`
-	Model          ModelInfo       `json:"-"`        // RawModel에서 파싱
+	Model          ModelInfo       `json:"-"` // RawModel에서 파싱
 	RawModel       json.RawMessage `json:"model"`
 	Workspace      *Workspace      `json:"workspace"`
 	OutputStyle    *OutputStyle    `json:"output_style"`
 	Cost           Cost            `json:"cost"`
 	ContextWindow  ContextWindow   `json:"context_window"`
 	Exceeds200K    bool            `json:"exceeds_200k_tokens"`
+	Effort         *Effort         `json:"effort"`
+	Thinking       *Thinking       `json:"thinking"`
 	RateLimits     *RateLimits     `json:"rate_limits"`
 	Vim            *Vim            `json:"vim"`
 	Agent          *Agent          `json:"agent"`
+	PR             *PR             `json:"pr"`
 	Worktree       *Worktree       `json:"worktree"`
 }
 
@@ -78,6 +82,24 @@ type RateLimits struct {
 type RateWindow struct {
 	UsedPercentage float64 `json:"used_percentage"`
 	ResetsAt       float64 `json:"resets_at"`
+}
+
+// Effort는 현재 세션의 reasoning effort 레벨을 나타낸다 (Claude Code 2.1.141+).
+// 모델이 effort를 지원하지 않으면 필드가 생략된다.
+type Effort struct {
+	Level string `json:"level"` // low, medium, high, xhigh, max
+}
+
+// Thinking은 extended thinking 활성화 여부를 나타낸다.
+type Thinking struct {
+	Enabled bool `json:"enabled"`
+}
+
+// PR은 현재 브랜치의 열린 풀 리퀘스트 정보를 나타낸다 (Claude Code 2.1.145+).
+type PR struct {
+	Number      int    `json:"number"`
+	URL         string `json:"url"`
+	ReviewState string `json:"review_state"` // approved, pending, changes_requested, draft (생략 가능)
 }
 
 // Vim은 Vim 모드 정보를 나타낸다.
