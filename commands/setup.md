@@ -97,7 +97,7 @@ Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions 
     "options": [
       {
         "label": "<translated: Normal (Recommended)>",
-        "description": "Model, ◷ Elapsed, Git, ◆ Context, ◆ Remaining, ▶ Agent, Vim"
+        "description": "Model · Effort, ◷ Elapsed, Git, PR, ◆ Context, ◆ Remaining, ▶ Agent, Vim"
       },
       {
         "label": "<translated: Detailed>",
@@ -105,7 +105,7 @@ Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions 
       },
       {
         "label": "<translated: Compact>",
-        "description": "<translated: Single line — Model, Context, Remaining only>"
+        "description": "<translated: Single line — Model · Effort, Context, Remaining>"
       },
       {
         "label": "<translated: Custom>",
@@ -138,7 +138,7 @@ Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions 
 }
 ```
 
-Note: Agent and Vim Mode are always ON in Custom mode (they only appear when active, no downside).
+Note: Agent, Vim Mode, Effort, and PR are always ON in Custom mode (they only appear when relevant, no downside). Session Name is OFF by default (Claude Code already shows the title in its UI) — users can enable it via `"sections": {"session": true}`.
 
 ### Preset mappings
 
@@ -195,17 +195,21 @@ Note: Agent and Vim Mode are always ON in Custom mode (they only appear when act
 
 ## Step 6: Configure statusLine in settings.json
 
-1. Resolve the script path: `${CLAUDE_PLUGIN_ROOT}/scripts/run.sh`
+1. ALWAYS copy the launcher first (run as a single Bash command, even if statusLine is already configured — this keeps the launcher up to date across plugin updates):
+   ```bash
+   mkdir -p ~/.claude/statusline
+   cp "${CLAUDE_PLUGIN_ROOT}/scripts/run.sh" ~/.claude/statusline/run.sh
+   ```
 2. Read `~/.claude/settings.json`
 3. Check the `statusLine` field:
    - **Not present** → add it
-   - **Present and same script** → skip (tell user it's already configured)
-   - **Present but different** → ask user with AskUserQuestion whether to replace
-4. The statusLine entry must be:
+   - **Present and same script** → skip the settings.json edit only (tell user it's already configured; the copy in step 1 still runs)
+   - **Present but different** (including old plugin-cache paths) → ask user with AskUserQuestion whether to replace
+4. The statusLine entry must be (resolve `<home>` to the absolute home directory):
 ```json
 "statusLine": {
   "type": "command",
-  "command": "bash <resolved-absolute-path>/scripts/run.sh"
+  "command": "bash <home>/.claude/statusline/run.sh"
 }
 ```
 
@@ -218,7 +222,7 @@ Output a preview using this EXACT template (substitute values based on user sele
 ```
 Setup complete! Preview:
 
-Line 1: Opus │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2
+Line 1: Opus · high │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2 │ PR#12✓
 Line 2: ◆ Context ▰▰▰▱▱ 55% │ ◆ Remaining 5h ▰▰▰▰▱ 70% (3h 45m) / 7d ▰▰▰▰▰ 94% (6d 12h)
 Line 3: ▶ code-explorer │ NORMAL
 

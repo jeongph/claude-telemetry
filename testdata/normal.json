@@ -1,8 +1,9 @@
 {
   "cwd": "/home/user/myproject",
   "session_id": "abc123",
+  "session_name": "my-session",
   "transcript_path": "/tmp/transcript.jsonl",
-  "version": "1.0.80",
+  "version": "2.1.170",
   "model": {"id": "claude-opus-4-6", "display_name": "Opus"},
   "workspace": {"current_dir": "/home/user/myproject", "project_dir": "/home/user/myproject"},
   "output_style": {"name": "default"},
@@ -27,10 +28,13 @@
     }
   },
   "exceeds_200k_tokens": false,
+  "effort": {"level": "high"},
+  "thinking": {"enabled": true},
   "rate_limits": {
     "five_hour": {"used_percentage": 12, "resets_at": 1742961600},
     "seven_day": {"used_percentage": 35, "resets_at": 1743393600}
   },
   "vim": {"mode": "NORMAL"},
-  "agent": {"name": "security-reviewer"}
+  "agent": {"name": "security-reviewer"},
+  "pr": {"number": 1234, "url": "https://github.com/jeongph/claude-telemetry/pull/1234", "review_state": "approved"}
 }

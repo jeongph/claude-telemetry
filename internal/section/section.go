@@ -15,13 +15,12 @@ type Context struct {
 	Locale  i18n.Locale
 	Colors  render.Colors
 	GitInfo *gitinfo.GitInfo
-	Effort  string // from settings.json
 }
 
 // Section is the interface that all status-line sections implement.
 type Section interface {
-	Name() string     // config key: "model", "context", etc.
-	Priority() int    // lower = more important (1=highest, 9=lowest)
+	Name() string  // config key: "model", "context", etc.
+	Priority() int // lower = more important (1=highest, 9=lowest)
 	Render(ctx *Context) string
 	Width(ctx *Context) int
 }
@@ -36,9 +35,11 @@ type LineSection struct {
 func AllSections() []LineSection {
 	return []LineSection{
 		// Line 1
+		{&SessionSection{}, 1},
 		{&ModelSection{}, 1},
 		{&ElapsedSection{}, 1},
 		{&GitSection{}, 1},
+		{&PRSection{}, 1},
 		// Line 2
 		{&ContextSection{}, 2},
 		{&RateLimitSection{}, 2},
@@ -49,5 +50,6 @@ func AllSections() []LineSection {
 		// Line 3
 		{&AgentSection{}, 3},
 		{&VimSection{}, 3},
+		{&ThinkingSection{}, 3},
 	}
 }

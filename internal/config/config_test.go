@@ -144,25 +144,6 @@ func TestResolveLanguage(t *testing.T) {
 	}
 }
 
-func TestReadEffortLevel(t *testing.T) {
-	dir := t.TempDir()
-
-	writeJSON(t, filepath.Join(dir, "settings.json"), map[string]interface{}{
-		"effortLevel": "high",
-	})
-	level := ReadEffortLevel(dir)
-	if level != "high" {
-		t.Errorf("ReadEffortLevel: got %q, want %q", level, "high")
-	}
-
-	// missing file → "auto"
-	emptyDir := t.TempDir()
-	level = ReadEffortLevel(emptyDir)
-	if level != "auto" {
-		t.Errorf("ReadEffortLevel(missing): got %q, want %q", level, "auto")
-	}
-}
-
 // helper
 func writeJSON(t *testing.T, path string, v interface{}) {
 	t.Helper()
