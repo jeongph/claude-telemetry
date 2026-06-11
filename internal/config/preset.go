@@ -13,7 +13,7 @@ var presets = map[string]PresetDef{
 		"thinking": false,
 	}},
 	"normal": {Sections: map[string]bool{
-		"session": true,
+		"session": false,
 		"model":   true, "effort": true, "elapsed": true, "git": true, "pr": true,
 		"context": true, "ratelimit": true, "cost": true,
 		"lines": false, "tokens": false, "apiduration": false,

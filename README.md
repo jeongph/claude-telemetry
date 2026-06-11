@@ -68,7 +68,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 - **Git integration** — folder:branch, ↑push/↓pull, changes (+/-), untracked (?N), stash (≡N), worktrees (⎇N)
 - **Effort level** — live reasoning effort (low/medium/high/xhigh/max) from the session, reflects `/effort` changes (Claude Code ≥ 2.1.141)
 - **PR badge** — open PR number and review state for the current branch, no `gh` CLI needed (Claude Code ≥ 2.1.145)
-- **Session name** — session title shown as `[name]`, auto-truncated to 20 columns
+- **Session name** — session title shown as `[name]`, auto-truncated to 20 columns (off by default — Claude Code already shows the title in its UI; enable via `sections` or the detailed preset)
 - **Rate limit countdown** — remaining time until reset with progress bar
 - **Dynamic color thresholds** — green/yellow/red based on remaining %, customizable via config
 - **Graceful degradation** — loading (···), partial failure (—), error messages instead of silent blank
@@ -83,7 +83,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 
 | Line | Section | Description |
 |------|---------|-------------|
-| 1 | Session | `[name]` session title (shown only when set, max 20 cols) |
+| 1 | Session | `[name]` session title (max 20 cols, detailed preset or opt-in) |
 | 1 | Model | Current model name |
 | 1 | Effort | ↯ reasoning effort level, color-coded (low→max) |
 | 1 | Elapsed | Session duration (Nh Nm format) |
@@ -132,7 +132,7 @@ Or edit `~/.claude/statusline/config.json` directly:
 | Preset | Lines | Sections |
 |--------|-------|----------|
 | `compact` | 1 | Model, Effort, Context, Remaining/Cost |
-| `normal` | 2 | Session, Model, Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
+| `normal` | 2 | Model, Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
 | `detailed` | 3 | All sections enabled |
 
 ### Section overrides

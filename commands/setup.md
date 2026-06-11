@@ -138,7 +138,7 @@ Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions 
 }
 ```
 
-Note: Agent, Vim Mode, Effort, PR, and Session Name are always ON in Custom mode (they only appear when relevant, no downside).
+Note: Agent, Vim Mode, Effort, and PR are always ON in Custom mode (they only appear when relevant, no downside). Session Name is OFF by default (Claude Code already shows the title in its UI) — users can enable it via `"sections": {"session": true}`.
 
 ### Preset mappings
 
