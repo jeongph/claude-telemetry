@@ -84,7 +84,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 | Line | Section | Description |
 |------|---------|-------------|
 | 1 | Session | `[name]` session title (max 20 cols, detailed preset or opt-in) |
-| 1 | Model | Model name with ↯ effort level beside it, color-coded low→max (toggle via `effort` key) |
+| 1 | Model | Model name with effort level beside it (`Fable 5 · xhigh`), color-coded low→max (toggle via `effort` key) |
 | 1 | Elapsed | Session duration (Nh Nm format) |
 | 1 | Git | folder:branch ↑push ↓pull +add/-del ?untracked ≡stash ⎇worktrees |
 | 1 | PR | Open PR number + review state ✓/●/✗/◌ (shown only when a PR is open) |
@@ -130,8 +130,8 @@ Or edit `~/.claude/statusline/config.json` directly:
 
 | Preset | Lines | Sections |
 |--------|-------|----------|
-| `compact` | 1 | Model ↯Effort, Context, Remaining/Cost |
-| `normal` | 2 | Model ↯Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
+| `compact` | 1 | Model · Effort, Context, Remaining/Cost |
+| `normal` | 2 | Model · Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
 | `detailed` | 3 | All sections enabled |
 
 ### Section overrides
