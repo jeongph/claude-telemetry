@@ -13,6 +13,7 @@ import (
 	"github.com/jeongph/claude-telemetry/internal/input"
 	"github.com/jeongph/claude-telemetry/internal/render"
 	"github.com/jeongph/claude-telemetry/internal/section"
+	"github.com/jeongph/claude-telemetry/internal/selfuninstall"
 )
 
 var version = "dev"
@@ -26,6 +27,18 @@ func main() {
 			return
 		case "--debug":
 			debug = true
+		case "--self-uninstall":
+			home, _ := os.UserHomeDir()
+			claudeDir := filepath.Join(home, ".claude")
+			slDir := os.Getenv("CLAUDE_STATUSLINE_CONFIG")
+			if slDir == "" {
+				slDir = filepath.Join(claudeDir, "statusline")
+			}
+			if err := selfuninstall.Run(claudeDir, slDir); err != nil {
+				fmt.Fprintln(os.Stderr, "self-uninstall:", err)
+				os.Exit(1)
+			}
+			return
 		}
 	}
 
