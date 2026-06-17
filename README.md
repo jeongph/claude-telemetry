@@ -104,6 +104,22 @@ Line 3 appears only when agent, vim mode, or thinking indicator is active.
 
 > **Note:** Since Claude Code 2.1.132, token counts reflect what is currently in the context window, not cumulative session totals.
 
+### Git status symbols
+
+The Git section renders as `folder:branch` followed by status markers. Each marker appears **only when its count is non-zero**, so a clean repo shows just `folder:branch`.
+
+| Symbol | Meaning | Color |
+|--------|---------|-------|
+| `folder:branch` | Current directory and current branch | white `:` magenta |
+| `↑N` | N commits ahead of upstream (waiting to push) | yellow |
+| `↓N` | N commits behind upstream (waiting to pull) | cyan |
+| `+N/-N` | Lines added / deleted vs. HEAD (staged + unstaged) | green / red |
+| `?N` | N untracked files | yellow |
+| `≡N` | N stash entries | magenta |
+| `⎇N` | N linked worktrees (excludes the main worktree) | cyan |
+
+> Example: `lighthouse:main ↑1 +12/-3 ?2 ⎇1` means branch `main` is 1 commit ahead of upstream, has 12 added / 3 deleted lines, 2 untracked files, and 1 linked worktree.
+
 ## Setup
 
 Run `/claude-telemetry:setup` in Claude Code for interactive configuration — it detects your language, downloads the binary, and walks you through preset selection.
