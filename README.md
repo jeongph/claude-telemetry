@@ -5,7 +5,7 @@ Customizable multi-line status line for [Claude Code](https://claude.com/claude-
 **"The status line you can trust"** — accurate, lightweight, never breaks.
 
 <p align="center">
-  <img width="762" height="599" alt="image" src="https://github.com/user-attachments/assets/41dc17e5-f577-4648-b288-165a014e6958" />
+  <img width="810" height="616" alt="image" src="https://github.com/user-attachments/assets/3eb1c1a5-a8b0-48ef-8f26-d6b691374a33" />
 </p>
 
 ## Installation
