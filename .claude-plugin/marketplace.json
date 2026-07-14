@@ -13,7 +13,7 @@
         "sha": "b56d7e3cd9012fcc2632c9d420936bf48777a3d1"
       },
       "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
-      "version": "2.4.1"
+      "version": "2.5.0"
     }
   ]
 }
