@@ -144,13 +144,16 @@ Call AskUserQuestion with EXACTLY this structure (translate labels/descriptions 
       {"label": "Code Changes", "description": "<translated: Lines added/removed in session>"},
       {"label": "Cost", "description": "<translated: Session cost in USD (API key users only)>"},
       {"label": "↻ API Duration", "description": "<translated: Time spent waiting for API responses>"},
-      {"label": "Token Details", "description": "<translated: Input/output token counts>"}
+      {"label": "Token Details", "description": "<translated: Input/output token counts>"},
+      {"label": "◉ User (email + plan)", "description": "<translated: Logged-in email + plan on a dedicated line — read from ~/.claude.json, hidden by default for privacy>"}
     ]
   }]
 }
 ```
 
 Note: Agent, Vim Mode, Effort, and PR are always ON in Custom mode (they only appear when relevant, no downside). Session Name is OFF by default (Claude Code already shows the title in its UI) — users can enable it via `"sections": {"session": true}`.
+
+**If the user selects "◉ User (email + plan)"**, warn them before enabling (translate to detected language): the email is read from `~/.claude.json` and will be **visible in screenshots and screen shares** whenever the status line is shown. Only enable it if they are comfortable with that. If they decline, drop `user` from the selection.
 
 ### Preset mappings
 
@@ -173,6 +176,7 @@ Note: Agent, Vim Mode, Effort, and PR are always ON in Custom mode (they only ap
 | Cost | cost |
 | ↻ API Duration | apiduration |
 | Token Details | tokens |
+| ◉ User (email + plan) | user |
 
 ---
 
@@ -200,7 +204,7 @@ Note: Agent, Vim Mode, Effort, and PR are always ON in Custom mode (they only ap
 ```
 
 - Set `preset` from Step 4 selection
-- For Custom: populate `sections` with user selections (only non-default values needed)
+- For Custom: populate `sections` with user selections (only non-default values needed). If ◉ User was selected and confirmed, add `"user": true` — it renders a dedicated line (Line 4) with email + plan.
 - Set `language` to detected language code, or `"en"` for Defaults
 
 ---
@@ -239,12 +243,13 @@ Setup complete! Preview:
 Line 1: Opus · high │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2 │ PR#12✓
 Line 2: ◆ Context ▰▰▰▱▱ 55% │ ◆ Remaining 5h ▰▰▰▰▱ 70% (3h 45m) / 7d ▰▰▰▰▰ 94% (6d 12h)
 Line 3: ▶ code-explorer │ NORMAL
+Line 4: ◉ you@example.com · Max
 
 Restart Claude Code to apply.
 From now on the binary stays in sync with the plugin automatically (checked at session start).
 ```
 
-- Only show sections the user enabled
+- Only show sections the user enabled (show Line 4 only if ◉ User was enabled)
 - Adjust bar width to match user's choice
 - For compact preset, show single line preview
 - Translate the message to detected language
