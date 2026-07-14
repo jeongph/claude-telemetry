@@ -397,8 +397,8 @@ func TestThinkingSectionNil(t *testing.T) {
 
 func TestAllSectionsRegistry(t *testing.T) {
 	sections := AllSections()
-	if len(sections) != 14 {
-		t.Errorf("AllSections: 14개 기대, got %d", len(sections))
+	if len(sections) != 15 {
+		t.Errorf("AllSections: 15개 기대, got %d", len(sections))
 	}
 }
 
