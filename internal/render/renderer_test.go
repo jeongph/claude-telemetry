@@ -14,6 +14,7 @@ func TestAssembleLinesNormal(t *testing.T) {
 			{Text: "tokens 15k", Width: 10, Priority: 9, Order: 2},
 		},
 		[]string{"agent-name", "NORMAL"},
+		nil,
 		" │ ", 80, false,
 	)
 	if len(lines) != 3 {
@@ -63,6 +64,7 @@ func TestEmptyLine3(t *testing.T) {
 		[]string{"Opus"},
 		[]ScoredSegment{{Text: "Context", Width: 7, Priority: 1, Order: 0}},
 		[]string{},
+		nil,
 		" │ ", 80, false,
 	)
 	if len(lines) != 2 {
@@ -78,6 +80,7 @@ func TestCompactMode(t *testing.T) {
 			{Text: "5h 88%", Width: 6, Priority: 2, Order: 1},
 		},
 		[]string{"NORMAL"},
+		nil,
 		" │ ", 80, true,
 	)
 	if len(lines) != 1 {
@@ -85,6 +88,35 @@ func TestCompactMode(t *testing.T) {
 	}
 	if !strings.Contains(lines[0], "Opus") || !strings.Contains(lines[0], "72%") {
 		t.Error("compact line should contain both model and context")
+	}
+}
+
+func TestLine4DedicatedRow(t *testing.T) {
+	lines := AssembleLines(
+		[]string{"Opus"},
+		[]ScoredSegment{{Text: "Context", Width: 7, Priority: 1, Order: 0}},
+		[]string{"NORMAL"},
+		[]string{"◉ user@example.com · Max"},
+		" │ ", 80, false,
+	)
+	if len(lines) != 4 {
+		t.Fatalf("전용 user 줄 포함 4줄이어야 함, got %d", len(lines))
+	}
+	if !strings.Contains(lines[3], "user@example.com") {
+		t.Errorf("line4에 user 세그먼트 누락 — got %q", lines[3])
+	}
+}
+
+func TestEmptyLine4(t *testing.T) {
+	lines := AssembleLines(
+		[]string{"Opus"},
+		[]ScoredSegment{{Text: "Context", Width: 7, Priority: 1, Order: 0}},
+		[]string{"NORMAL"},
+		[]string{},
+		" │ ", 80, false,
+	)
+	if len(lines) != 3 {
+		t.Errorf("빈 line4는 줄을 추가하지 않아야 함, got %d", len(lines))
 	}
 }
 

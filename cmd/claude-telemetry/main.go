@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jeongph/claude-telemetry/internal/account"
 	"github.com/jeongph/claude-telemetry/internal/config"
 	"github.com/jeongph/claude-telemetry/internal/gitinfo"
 	"github.com/jeongph/claude-telemetry/internal/i18n"
@@ -88,12 +89,19 @@ func main() {
 	cols := getTerminalWidth()
 
 	// 8. Build section context
+	// 계정 정보(user 섹션)는 민감하고 파일 I/O가 필요하므로,
+	// 섹션이 켜져 있을 때만 ~/.claude.json에서 읽는다.
+	var acc *account.Account
+	if cfg.IsSectionEnabled("user") {
+		acc = account.Load(filepath.Join(home, ".claude.json"))
+	}
 	ctx := &section.Context{
 		Input:   inp,
 		Config:  cfg,
 		Locale:  locale,
 		Colors:  colors,
 		GitInfo: gitInfo,
+		Account: acc,
 	}
 
 	// 9. Render sections per line
@@ -101,6 +109,7 @@ func main() {
 	var line1Parts []string
 	var line2Segments []render.ScoredSegment
 	var line3Parts []string
+	var line4Parts []string
 
 	order := 0
 	for _, ls := range allSections {
@@ -125,13 +134,17 @@ func main() {
 			if text != "" {
 				line3Parts = append(line3Parts, text)
 			}
+		case 4:
+			if text != "" {
+				line4Parts = append(line4Parts, text)
+			}
 		}
 	}
 
 	// 10. Assemble and output
 	compact := cfg.Preset == "compact"
 	sep := cfg.Separator
-	lines := render.AssembleLines(line1Parts, line2Segments, line3Parts, sep, cols, compact)
+	lines := render.AssembleLines(line1Parts, line2Segments, line3Parts, line4Parts, sep, cols, compact)
 
 	if debug {
 		fmt.Fprintf(os.Stderr, "[debug] config: preset=%s lang=%s user_type=%s\n", cfg.Preset, lang, cfg.UserType)

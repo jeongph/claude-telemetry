@@ -1,6 +1,7 @@
 package section
 
 import (
+	"github.com/jeongph/claude-telemetry/internal/account"
 	"github.com/jeongph/claude-telemetry/internal/config"
 	"github.com/jeongph/claude-telemetry/internal/gitinfo"
 	"github.com/jeongph/claude-telemetry/internal/i18n"
@@ -15,6 +16,7 @@ type Context struct {
 	Locale  i18n.Locale
 	Colors  render.Colors
 	GitInfo *gitinfo.GitInfo
+	Account *account.Account // 로그인 계정 정보 (없으면 nil)
 }
 
 // Section is the interface that all status-line sections implement.
@@ -51,5 +53,7 @@ func AllSections() []LineSection {
 		{&AgentSection{}, 3},
 		{&VimSection{}, 3},
 		{&ThinkingSection{}, 3},
+		// Line 4 (전용 줄)
+		{&UserSection{}, 4},
 	}
 }
