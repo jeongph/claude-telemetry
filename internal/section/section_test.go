@@ -334,6 +334,19 @@ func TestPRSectionNil(t *testing.T) {
 	}
 }
 
+func TestPRSectionMarkBeforeNumber(t *testing.T) {
+	// 리뷰 상태 기호(◌/●/✓/✗)가 번호 뒤에 붙으면 0·o와 헷갈리므로
+	// 기호는 반드시 번호 앞에 온다: "✓ PR#1234"
+	ctx := testContext(t) // normal.json: approved → ✓
+	got := render.StripANSI((&PRSection{}).Render(ctx))
+	if !strings.HasPrefix(got, "✓") {
+		t.Errorf("PRSection: 리뷰 상태 기호가 맨 앞에 와야 함 — got %q", got)
+	}
+	if strings.Index(got, "✓") > strings.Index(got, "PR#") {
+		t.Errorf("PRSection: 기호가 PR 번호 뒤에 있음 — got %q", got)
+	}
+}
+
 func TestPRSectionNoReviewState(t *testing.T) {
 	ctx := testContext(t)
 	ctx.Input.PR.ReviewState = ""

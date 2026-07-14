@@ -18,18 +18,24 @@ func (s *PRSection) Render(ctx *Context) string {
 	if pr == nil || pr.Number == 0 {
 		return ""
 	}
-	out := ctx.Colors.Cyan(fmt.Sprintf("PR#%d", pr.Number))
+	// 리뷰 상태 기호는 번호 앞에 둔다 — 번호 뒤에 붙으면 ◌·● 등이
+	// 숫자 0·o와 붙어 보여 오인될 수 있다 (예: "PR#8◌" → "PR#80").
+	var mark string
 	switch pr.ReviewState {
 	case "approved":
-		out += ctx.Colors.Green("✓")
+		mark = ctx.Colors.Green("✓")
 	case "pending":
-		out += ctx.Colors.Yellow("●")
+		mark = ctx.Colors.Yellow("●")
 	case "changes_requested":
-		out += ctx.Colors.Red("✗")
+		mark = ctx.Colors.Red("✗")
 	case "draft":
-		out += ctx.Colors.Dim("◌")
+		mark = ctx.Colors.Dim("◌")
 	}
-	return out
+	label := ctx.Colors.Cyan(fmt.Sprintf("PR#%d", pr.Number))
+	if mark != "" {
+		return mark + " " + label
+	}
+	return label
 }
 
 func (s *PRSection) Width(ctx *Context) int {

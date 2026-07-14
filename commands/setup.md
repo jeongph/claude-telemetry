@@ -240,7 +240,7 @@ Output a preview using this EXACT template (substitute values based on user sele
 ```
 Setup complete! Preview:
 
-Line 1: Opus · high │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2 │ PR#12✓
+Line 1: Opus · high │ ◷ Elapsed 12m 30s │ myproject:main ↑1 +15/-3 ?2 │ ✓ PR#12
 Line 2: ◆ Context ▰▰▰▱▱ 55% │ ◆ Remaining 5h ▰▰▰▰▱ 70% (3h 45m) / 7d ▰▰▰▰▰ 94% (6d 12h)
 Line 3: ▶ code-explorer │ NORMAL
 Line 4: ◉ you@example.com · Max
