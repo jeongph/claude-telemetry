@@ -14,7 +14,8 @@ type ScoredSegment struct {
 
 // AssembleLines builds the final output lines.
 // compact=true merges everything into 1 line.
-func AssembleLines(line1Parts []string, line2Segments []ScoredSegment, line3Parts []string, sep string, maxWidth int, compact bool) []string {
+// line4Parts는 전용 줄(예: user 섹션)로, 비어 있으면 줄을 만들지 않는다.
+func AssembleLines(line1Parts []string, line2Segments []ScoredSegment, line3Parts, line4Parts []string, sep string, maxWidth int, compact bool) []string {
 	if compact {
 		// Compact mode: merge line2 segments into line1
 		all := make([]string, 0)
@@ -53,6 +54,12 @@ func AssembleLines(line1Parts []string, line2Segments []ScoredSegment, line3Part
 	l3 := joinNonEmpty(line3Parts, sep)
 	if l3 != "" {
 		lines = append(lines, l3)
+	}
+
+	// Line 4: 전용 줄, non-empty일 때만
+	l4 := joinNonEmpty(line4Parts, sep)
+	if l4 != "" {
+		lines = append(lines, l4)
 	}
 
 	return lines

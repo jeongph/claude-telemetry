@@ -69,6 +69,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 - **Effort level** — live reasoning effort (low/medium/high/xhigh/max) shown beside the model name, reflects `/effort` changes (Claude Code ≥ 2.1.141)
 - **PR badge** — open PR number and review state for the current branch, no `gh` CLI needed (Claude Code ≥ 2.1.145)
 - **Session name** — session title shown as `[name]`, auto-truncated to 20 columns (off by default — Claude Code already shows the title in its UI; enable via `sections` or the detailed preset)
+- **User identity** — logged-in email + plan (`Max`/`Pro`/`Team`) on a dedicated line, read from `~/.claude.json` (not in the status line JSON). Off by default for privacy — enable via `sections.user`
 - **Rate limit countdown** — remaining time until reset with progress bar
 - **Dynamic color thresholds** — green/yellow/red based on remaining %, customizable via config
 - **Graceful degradation** — loading (···), partial failure (—), error messages instead of silent blank
@@ -99,8 +100,9 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 | 3 | Agent | Active agent name (shown only when active) |
 | 3 | Vim | Vim mode indicator (shown only when active) |
 | 3 | Thinking | ✦ extended thinking indicator (shown only when enabled) |
+| 4 | User | ◉ logged-in email + plan on a dedicated line (off by default, opt-in) |
 
-Line 3 appears only when agent, vim mode, or thinking indicator is active.
+Line 3 appears only when agent, vim mode, or thinking indicator is active. Line 4 appears only when the `user` section is enabled.
 
 > **Note:** Since Claude Code 2.1.132, token counts reflect what is currently in the context window, not cumulative session totals.
 
@@ -165,6 +167,22 @@ Use `sections` to override preset defaults:
   }
 }
 ```
+
+### User section (email + plan)
+
+The `user` section shows your logged-in email and plan on a dedicated line (e.g. `◉ you@example.com · Max`). It is **off by default** — enable it explicitly:
+
+```json
+{
+  "sections": {
+    "user": true
+  }
+}
+```
+
+- **Source:** this info is not part of the status line JSON. It is read from `~/.claude.json` (`oauthAccount`), an internal Claude Code file, and parsed defensively — if the file or fields are missing, the section is silently skipped.
+- **Privacy:** the status line is visible in screenshots and screen shares. Keep it off unless you want your email on screen at all times.
+- **Plan labels:** `claude_max` → `Max`, `claude_pro` → `Pro`, `claude_team` → `Team`, `claude_enterprise` → `Enterprise`. Unknown plans are omitted (email only).
 
 ### Thresholds
 
