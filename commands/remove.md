@@ -89,15 +89,34 @@ Based on user choice:
 
 ## Step 4: Done
 
-Output a completion message using this EXACT template (translate to detected language):
+Output a completion message. Translate to detected language. Use the template that matches the user's Step 2 choice.
+
+### For "Remove all"
 
 ```
 Status line configuration has been removed. Restart Claude Code to apply.
 
+Your previous settings.json was backed up to:
+  ~/.claude/settings.json.claude-telemetry.bak
+To restore it, move that file back over ~/.claude/settings.json.
+
+This removed the status line configuration only — the plugin is still installed.
+To remove the plugin entirely: /plugin uninstall claude-telemetry
+
 To set up again: /claude-telemetry:setup
 ```
 
-A harmless stub may remain at ~/.claude/statusline/run.sh — you can delete the directory after restarting.
+A harmless stub may remain at ~/.claude/statusline/run.sh — you can delete the
+~/.claude/statusline directory after restarting.
+
+### For "Config only"
+
+```
+The status line config file has been deleted (binary and statusLine entry kept).
+The status line now falls back to default settings. Restart Claude Code to apply.
+
+To reconfigure: /claude-telemetry:setup
+```
 
 ---
 
