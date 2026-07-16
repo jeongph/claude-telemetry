@@ -13,12 +13,31 @@ Execute steps 1 → 2 → 3 → 4 → 5 → 6 → 7 sequentially. Do NOT skip st
 
 ---
 
-## Step 1: Detect Language
+## Step 1: Detect & Confirm Language
 
-1. Read `~/.claude/settings.json`
-2. Check the `language` field
-3. Map: `"한국어"` → ko, `"English"` → en, `"日本語"` → ja, `"中文"` → zh
-4. If the `language` field is missing or does not match any mapping → ask the user:
+1. Read `~/.claude/settings.json` and check the `language` field.
+2. Map it to a code: `"한국어"` → ko, `"English"` → en, `"日本語"` → ja, `"中文"` → zh. If the field is missing or does not match any mapping, treat the language as **not detected**.
+3. **ALWAYS confirm with the user** via AskUserQuestion — never silently auto-apply the detected value. Present the detected value so the user can keep it or pick another.
+
+   **If a language was detected**, list it FIRST with a `(detected)` suffix, then the remaining three (substitute `<detected>` and the others accordingly):
+
+```json
+{
+  "questions": [{
+    "question": "Detected language: <detected>. Keep it, or choose another for the status line?",
+    "header": "Language",
+    "multiSelect": false,
+    "options": [
+      {"label": "<detected> (detected)"},
+      {"label": "<other language 1>"},
+      {"label": "<other language 2>"},
+      {"label": "<other language 3>"}
+    ]
+  }]
+}
+```
+
+   **If nothing was detected**, list all four in default order:
 
 ```json
 {
@@ -36,8 +55,7 @@ Execute steps 1 → 2 → 3 → 4 → 5 → 6 → 7 sequentially. Do NOT skip st
 }
 ```
 
-Map the selection: "English" → en, "한국어" → ko, "日本語" → ja, "中文" → zh
-
+4. Map the selection to its code: "English" → en, "한국어" → ko, "日本語" → ja, "中文" → zh (ignore the `(detected)` suffix when mapping).
 5. Use this language for ALL user-facing text in the remaining steps. Do NOT infer language from conversation context.
 
 ---
