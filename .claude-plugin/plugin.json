@@ -1,6 +1,6 @@
 {
   "name": "claude-telemetry",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
   "author": {
     "name": "JeongUk Park",
