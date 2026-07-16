@@ -79,6 +79,38 @@ func TestContextSectionNull(t *testing.T) {
 	}
 }
 
+func TestContextSectionNoBar(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Config.BarWidth = 0 // 바 없이 % 만
+	s := &ContextSection{}
+	got := s.Render(ctx)
+	if strings.ContainsAny(got, "▰▱") {
+		t.Errorf("bar_width 0: 바 문자가 없어야 함 — got %q", got)
+	}
+	if strings.Contains(got, "  ") {
+		t.Errorf("bar_width 0: 이중 공백 없어야 함 — got %q", got)
+	}
+	if !strings.Contains(got, "72%") {
+		t.Errorf("bar_width 0: %% 값은 유지해야 함 — got %q", got)
+	}
+}
+
+func TestRateLimitSectionNoBar(t *testing.T) {
+	ctx := testContext(t)
+	ctx.Config.BarWidth = 0 // 바 없이 % 만
+	// 활성 상태로 만들어 바가 그려질 조건 확보
+	ctx.Input.RateLimits.FiveHour.ResetsAt = float64(time.Now().Add(2 * time.Hour).Unix())
+	ctx.Input.RateLimits.SevenDay.ResetsAt = float64(time.Now().Add(4 * 24 * time.Hour).Unix())
+	s := &RateLimitSection{}
+	got := s.Render(ctx)
+	if strings.ContainsAny(got, "▰▱") {
+		t.Errorf("bar_width 0: 바 문자가 없어야 함 — got %q", got)
+	}
+	if strings.Contains(got, "  ") {
+		t.Errorf("bar_width 0: 이중 공백 없어야 함 — got %q", got)
+	}
+}
+
 func TestRateLimitSectionExpired(t *testing.T) {
 	ctx := testContext(t)
 	// normal.json의 resets_at은 과거 → 리셋됨 표시
