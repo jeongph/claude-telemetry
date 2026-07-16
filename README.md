@@ -126,6 +126,8 @@ The Git section renders as `folder:branch` followed by status markers. Each mark
 
 Run `/claude-telemetry:setup` in Claude Code for interactive configuration — it detects your language, downloads the binary, and walks you through preset selection.
 
+To adjust the display later — preset, which sections show, and how detailed the bars are — run `/claude-telemetry:config` (an interactive wizard, no JSON editing needed).
+
 Or edit `~/.claude/statusline/config.json` directly:
 
 ```json
@@ -153,6 +155,18 @@ Or edit `~/.claude/statusline/config.json` directly:
 | `compact` | 1 | Model · Effort, Context, Remaining/Cost |
 | `normal` | 2 | Model · Effort, Elapsed, Git, PR, Context, Remaining/Cost, Agent, Vim |
 | `detailed` | 3 | All sections enabled |
+
+### Bar width
+
+`bar_width` controls the progress bars on Context and Remaining:
+
+| Value | Rendering |
+|-------|-----------|
+| `0` | `◆ Context 54%` — numbers only, no bar |
+| `5` | `◆ Context ▰▰▰▱▱ 54%` — default |
+| `10` | `◆ Context ▰▰▰▰▰▱▱▱▱▱ 54%` — most detailed |
+
+Allowed range is `0` or `3`–`10` (`1`–`2` are widened to `3`).
 
 ### Section overrides
 
