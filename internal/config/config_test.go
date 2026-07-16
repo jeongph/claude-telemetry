@@ -54,6 +54,31 @@ func TestBarWidthClamp(t *testing.T) {
 	}
 }
 
+func TestBarWidthZero(t *testing.T) {
+	dir := t.TempDir()
+
+	// bar_width 0은 "바 없이 % 만" 특수값 → 0으로 보존
+	writeJSON(t, filepath.Join(dir, "config.json"), map[string]interface{}{"bar_width": 0})
+	cfg := Load(dir, "")
+	if cfg.BarWidth != 0 {
+		t.Errorf("bar_width 0: got %d, want 0 (바 없이 %% 만)", cfg.BarWidth)
+	}
+
+	// 1~2는 너무 좁아 3으로 상향 (0만 특수값)
+	writeJSON(t, filepath.Join(dir, "config.json"), map[string]interface{}{"bar_width": 2})
+	cfg = Load(dir, "")
+	if cfg.BarWidth != 3 {
+		t.Errorf("bar_width 2: got %d, want 3", cfg.BarWidth)
+	}
+
+	// 음수는 0(바 없음)으로 정규화
+	writeJSON(t, filepath.Join(dir, "config.json"), map[string]interface{}{"bar_width": -1})
+	cfg = Load(dir, "")
+	if cfg.BarWidth != 0 {
+		t.Errorf("bar_width -1: got %d, want 0", cfg.BarWidth)
+	}
+}
+
 func TestProjectConfigMerge(t *testing.T) {
 	globalDir := t.TempDir()
 	projectDir := t.TempDir()
