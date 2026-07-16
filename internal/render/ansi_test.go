@@ -91,3 +91,12 @@ func TestProgressBarZeroAndFull(t *testing.T) {
 		t.Errorf("100%% bar width = %d", DisplayWidth(bar100))
 	}
 }
+
+func TestProgressBarZeroWidth(t *testing.T) {
+	c := NewColors(false)
+	// width 0 → "바 없이 % 만" 모드: 빈 문자열 반환
+	bar := ProgressBarRemaining(72, 0, c, 50, 20)
+	if bar != "" {
+		t.Errorf("bar_width 0: 빈 문자열이어야 함 — got %q", bar)
+	}
+}

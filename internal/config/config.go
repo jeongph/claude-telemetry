@@ -80,8 +80,12 @@ func Load(configDir, projectDir string) Config {
 		}
 	}
 
-	// clamp bar_width
-	if cfg.BarWidth < 3 {
+	// clamp bar_width — 0은 "바 없이 % 만" 특수값으로 보존한다.
+	// 1~2는 너무 좁아 3으로 상향, 음수는 0(바 없음)으로, 10 초과는 10으로 제한한다.
+	if cfg.BarWidth < 0 {
+		cfg.BarWidth = 0
+	}
+	if cfg.BarWidth >= 1 && cfg.BarWidth < 3 {
 		cfg.BarWidth = 3
 	}
 	if cfg.BarWidth > 10 {
