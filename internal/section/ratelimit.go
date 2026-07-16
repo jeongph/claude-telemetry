@@ -67,6 +67,9 @@ func renderRateWindow(usedPct float64, resetsAt float64, label string, ctx *Cont
 		resetTime := time.Unix(int64(resetsAt), 0)
 		if time.Now().After(resetTime) {
 			emptyBar := render.ProgressBarRemaining(0, ctx.Config.BarWidth, ctx.Colors, 50, 20)
+			if emptyBar == "" {
+				return ctx.Colors.Dim(label) + " " + ctx.Colors.Dim("···")
+			}
 			return ctx.Colors.Dim(label) + " " + emptyBar + " " + ctx.Colors.Dim("···")
 		}
 	}
@@ -99,7 +102,12 @@ func renderRateWindow(usedPct float64, resetsAt float64, label string, ctx *Cont
 
 	labelStr := ctx.Colors.Dim(label)
 
-	result := labelStr + " " + bar + " " + pctStr
+	// bar_width 0이면 바가 빈 문자열 — 바와 그 앞 공백을 생략한다.
+	result := labelStr
+	if bar != "" {
+		result += " " + bar
+	}
+	result += " " + pctStr
 	if countdown != "" {
 		result += " " + ctx.Colors.Dim("(") + countdown + ctx.Colors.Dim(")")
 	}
