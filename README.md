@@ -12,16 +12,16 @@ Customizable multi-line status line for [Claude Code](https://claude.com/claude-
 
 ### Via marketplace (recommended)
 
-1. Add marketplace:
+1. Add the [jeongph/claude-plugins](https://github.com/jeongph/claude-plugins) marketplace (one-time):
 
 ```
-/plugin marketplace add jeongph/claude-telemetry
+/plugin marketplace add jeongph/claude-plugins
 ```
 
 2. Install:
 
 ```
-/plugin install claude-telemetry@jeongph-claude-telemetry
+/plugin install claude-telemetry@jeongph-claude-plugins
 ```
 
 3. Run interactive setup:

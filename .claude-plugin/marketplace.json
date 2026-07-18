@@ -4,6 +4,7 @@
     "name": "JeongUk Park",
     "email": "jeongph.dev@gmail.com"
   },
+  "description": "Marketplace for claude-telemetry",
   "plugins": [
     {
       "name": "claude-telemetry",
