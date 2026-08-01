@@ -11,7 +11,7 @@
       "source": {
         "source": "url",
         "url": "https://github.com/jeongph/claude-telemetry.git",
-        "sha": "4b36985922db607299fe41e32ae4323fc229bdde"
+        "sha": "9ed4f32913d9d77a48f4dfaee9cc0b66fc2250b4"
       },
       "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
       "version": "2.6.0"
