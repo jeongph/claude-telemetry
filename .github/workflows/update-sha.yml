@@ -9,6 +9,13 @@ on:
 permissions:
   contents: write
 
+# auto-release.yml 과 같은 그룹을 써서 직렬화한다. 둘 다 main push 에
+# 반응해 각자 커밋을 push 하므로, 동시에 돌면 한쪽이 non-fast-forward 로
+# 튕긴다.
+concurrency:
+  group: main-push-writers-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   update-sha:
     runs-on: ubuntu-latest
