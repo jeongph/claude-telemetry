@@ -1,5 +1,8 @@
 # claude-telemetry
 
+[![version](https://img.shields.io/github/v/release/jeongph/claude-telemetry?label=version&color=blue)](https://github.com/jeongph/claude-telemetry/releases)
+[![license](https://img.shields.io/github/license/jeongph/claude-telemetry?color=lightgrey)](LICENSE)
+
 Customizable multi-line status line for [Claude Code](https://claude.com/claude-code).
 
 **"The status line you can trust"** — accurate, lightweight, never breaks.
