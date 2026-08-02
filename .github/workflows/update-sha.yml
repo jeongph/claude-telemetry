@@ -1,10 +1,18 @@
 name: Update marketplace SHA
 
+# auto-release 가 만드는 "chore(release): x.y.z" 커밋은 GITHUB_TOKEN 으로
+# push 되어 push 이벤트를 일으키지 않는다(재귀 방지). 그래서 릴리스가 날
+# 때마다 marketplace.json 이 낡은 채로 남았다. workflow_run 은 그 제약을
+# 받지 않으므로 릴리스가 끝난 뒤 이어서 돈다.
 on:
   push:
     branches: [main]
     paths-ignore:
       - '.claude-plugin/marketplace.json'
+  workflow_run:
+    workflows: ['Auto release']
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: write
@@ -20,7 +28,11 @@ jobs:
   update-sha:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # ref 를 명시한다. workflow_run 으로 들어오면 github.sha 는 auto-release 가
+      # "시작된" 커밋이라 그 뒤에 얹힌 범프 커밋을 놓친다.
+      - uses: actions/checkout@v5
+        with:
+          ref: main
 
       - name: Update SHA in marketplace.json
         run: |
