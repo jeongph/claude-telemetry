@@ -13,7 +13,7 @@
         "url": "https://github.com/jeongph/claude-telemetry.git",
         "sha": "cfd42633ece0f5f5e06091da51d6810f7f7e676b"
       },
-      "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
+      "description": "남은 컨텍스트와 사용 한도, 추론 수준, Git 상태, 토큰 수를 터미널 하단에 표시합니다.",
       "version": "2.6.0"
     }
   ]
