@@ -5,7 +5,7 @@
 
 Customizable multi-line status line for [Claude Code](https://claude.com/claude-code).
 
-**"The status line you can trust"** — accurate, lightweight, never breaks.
+Displays session, context, usage, and Git information. Choose a preset or configure individual sections.
 
 <p align="center">
   <img width="810" height="616" alt="image" src="https://github.com/user-attachments/assets/3eb1c1a5-a8b0-48ef-8f26-d6b691374a33" />
@@ -75,7 +75,7 @@ cp claude-telemetry/config.example.json ~/.claude/statusline/config.json
 - **User identity** — logged-in email + plan (`Max`/`Pro`/`Team`) on a dedicated line, read from `~/.claude.json` (not in the status line JSON). Off by default for privacy — enable via `sections.user`
 - **Rate limit countdown** — remaining time until reset with progress bar
 - **Dynamic color thresholds** — green/yellow/red based on remaining %, customizable via config
-- **Graceful degradation** — loading (···), partial failure (—), error messages instead of silent blank
+- **Loading and error states** — loading (···), partial failure (—), error messages instead of silent blank
 - **Progress bars** — ▰▱ visualization, color-coded green → yellow → red
 - **Adaptive width** — auto-drops lower priority sections on narrow terminals
 - **i18n** — English, Korean, Japanese, Chinese (auto-detected)
@@ -233,7 +233,7 @@ If you uninstall the plugin without running remove first, the status line detect
 
 - **Plugin users (v2.4.0+):** update the plugin (`/plugin` → Update), then restart Claude Code. The SessionStart hook syncs the binary to the plugin version automatically.
 - **Plugin users (older):** run `/claude-telemetry:setup` once after updating the plugin — it downloads the matching binary and migrates your settings to the version-independent launcher path.
-- **Manual installs:** re-run the curl command from Manual setup; the binary is all that matters.
+- **Manual installs:** re-run the curl command from Manual setup; replace the binary to complete the update.
 
 ## Upgrading from v1
 

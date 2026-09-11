@@ -1,7 +1,7 @@
 {
   "name": "claude-telemetry",
   "version": "2.6.2",
-  "description": "Customizable multi-line status line for Claude Code — real-time session telemetry in your terminal",
+  "description": "남은 컨텍스트와 사용 한도, 추론 수준, Git 상태, 토큰 수를 터미널 하단에 표시합니다.",
   "author": {
     "name": "JeongUk Park",
     "url": "https://github.com/jeongph"
