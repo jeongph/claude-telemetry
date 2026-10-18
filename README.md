@@ -123,7 +123,7 @@ The Git section renders as `folder:branch` followed by status markers. Each mark
 | `≡N` | N stash entries | magenta |
 | `⎇N` | N linked worktrees (excludes the main worktree) | cyan |
 
-> Example: `lighthouse:main ↑1 +12/-3 ?2 ⎇1` means branch `main` is 1 commit ahead of upstream, has 12 added / 3 deleted lines, 2 untracked files, and 1 linked worktree.
+> Example: `myrepo:main ↑1 +12/-3 ?2 ⎇1` means branch `main` is 1 commit ahead of upstream, has 12 added / 3 deleted lines, 2 untracked files, and 1 linked worktree.
 
 ## Setup
 
