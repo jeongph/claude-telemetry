@@ -1,24 +1,24 @@
 name: Auto release
 
-# 커밋 타입에서 다음 버전을 정해 빌드하고, plugin.json 을 올린 뒤 태그와
-# Release 를 만든다.
+# 커밋 타입에서 다음 버전을 정해 빌드하고, plugin.json을 올린 뒤 태그와
+# Release를 만든다.
 #
-# 다른 플러그인들은 claude-plugins 의 재사용 워크플로우를 그대로 호출하지만
-# 이 레포는 그럴 수 없다. commands/setup.md 가 plugin.json 의 version 으로
-# 다운로드 URL 을 조립하기 때문이다.
+# 다른 플러그인들은 claude-plugins의 재사용 워크플로우를 그대로 호출하지만
+# 이 레포는 그럴 수 없다. commands/setup.md가 plugin.json의 version으로
+# 다운로드 URL을 조립하기 때문이다.
 #
 #   BASE=".../releases/download/v${PLUGIN_VER}"
 #   curl -fsSL "${BASE}/${NAME}"
 #
-# 즉 version 을 올리는 것은 "그 태그에 바이너리가 있다"는 약속이다. 재사용
-# 워크플로우는 바이너리를 만들지 못하므로 그대로 쓰면 DOWNLOAD_FAILED 로
+# 즉 version을 올리는 것은 "그 태그에 바이너리가 있다"는 약속이다. 재사용
+# 워크플로우는 바이너리를 만들지 못하므로 그대로 쓰면 DOWNLOAD_FAILED로
 # 설치가 깨진다.
 #
-# 태그 push 로 빌드를 잇는 방법도 안 된다. GITHUB_TOKEN 으로 만든 태그는
+# 태그 push로 빌드를 잇는 방법도 안 된다. GITHUB_TOKEN으로 만든 태그는
 # 다른 워크플로우를 트리거하지 않는다(재귀 방지). 그래서 판정 스크립트만
-# claude-plugins 에서 가져다 쓰고 빌드·릴리스는 이 워크플로우가 직접 한다.
+# claude-plugins에서 가져다 쓰고 빌드와 릴리스는 이 워크플로우가 직접 한다.
 #
-# 순서가 중요하다. 빌드를 끝낸 뒤에 version 을 올린다 — 반대로 하면 빌드가
+# 순서가 중요하다. 빌드를 끝낸 뒤에 version을 올린다. 반대로 하면 빌드가
 # 실패했을 때 바이너리 없는 버전이 사용자에게 노출된다.
 on:
   push:
@@ -28,8 +28,8 @@ on:
 permissions:
   contents: write
 
-# update-sha.yml 과 같은 그룹을 써서 직렬화한다. 둘 다 main push 에 반응해
-# 각자 커밋을 push 하므로, 동시에 돌면 한쪽이 non-fast-forward 로 튕긴다.
+# update-sha.yml과 같은 그룹을 써서 직렬화한다. 둘 다 main push에 반응해
+# 각자 커밋을 push하므로, 동시에 돌면 한쪽이 non-fast-forward로 튕긴다.
 concurrency:
   group: main-push-writers-${{ github.ref }}
   cancel-in-progress: false
@@ -61,7 +61,7 @@ jobs:
         run: |
           CURRENT=$(jq -r '.version // empty' .claude-plugin/plugin.json)
           if [ -z "$CURRENT" ]; then
-            echo "plugin.json 에 version 이 없다 — 건너뛴다"
+            echo "plugin.json에 version이 없어 건너뛴다"
             echo "release=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -79,7 +79,7 @@ jobs:
           set -e
 
           if [ "$rc" -eq 10 ]; then
-            echo "릴리스할 변경이 없다 (docs·chore·ci 등만 쌓임) — 건너뛴다"
+            echo "릴리스할 변경이 없어 건너뛴다 (docs, chore, ci 등만 쌓임)"
             echo "release=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -88,7 +88,7 @@ jobs:
             exit 1
           fi
           if git rev-parse "v$NEXT" >/dev/null 2>&1; then
-            echo "v$NEXT 태그가 이미 있다 — 건너뛴다"
+            echo "v$NEXT 태그가 이미 있어 건너뛴다"
             echo "release=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -158,9 +158,9 @@ jobs:
         run: |
           mkdir -p release
           find dist -type f -name 'claude-telemetry-*' -exec mv {} release/ \;
-          # glob 을 바이너리로 한정한다. ./* 를 쓰면 파일명이 "./claude-telemetry-..."
-          # 로 기록돼 setup.md 의 `$2 == n` 매칭이 빗나가고(CHECKSUM_FAILED),
-          # 리다이렉션으로 먼저 생긴 빈 checksums.txt 까지 목록에 들어간다.
+          # glob을 바이너리로 한정한다. ./*를 쓰면 파일명이 "./claude-telemetry-..."로
+          # 기록돼 setup.md의 `$2 == n` 매칭이 빗나가고(CHECKSUM_FAILED),
+          # 리다이렉션으로 먼저 생긴 빈 checksums.txt까지 목록에 들어간다.
           (cd release && sha256sum claude-telemetry-* > checksums.txt)
           cat release/checksums.txt
 
@@ -176,8 +176,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .claude-plugin/plugin.json
           git commit -m "chore(release): $NEXT"
-          # update-sha.yml 도 같은 push 에 반응해 커밋을 얹는다. 그쪽이 먼저
-          # 끝나면 이 push 가 non-fast-forward 로 튕기므로 한 번 되감아 붙인다.
+          # update-sha.yml도 같은 push에 반응해 커밋을 얹는다. 그쪽이 먼저
+          # 끝나면 이 push가 non-fast-forward로 튕기므로 한 번 되감아 붙인다.
           git push || { git pull --rebase origin main && git push; }
 
       - name: Create release
@@ -192,8 +192,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           NEXT: ${{ needs.version.outputs.next }}
         run: |
-          # setup.md 가 이 이름들을 그대로 조립해 내려받는다. 하나라도 빠지면
-          # 설치가 DOWNLOAD_FAILED 로 깨지므로 여기서 확인하고 끝낸다.
+          # setup.md가 이 이름들을 그대로 조립해 내려받는다. 하나라도 빠지면
+          # 설치가 DOWNLOAD_FAILED로 깨지므로 여기서 확인하고 끝낸다.
           # 한 줄로 둔다. 여러 줄로 쓰면 값에 개행이 섞여 단어 분리가 어긋난다.
           BINARIES="claude-telemetry-darwin-amd64 claude-telemetry-darwin-arm64 claude-telemetry-linux-amd64 claude-telemetry-linux-arm64"
 
@@ -203,10 +203,10 @@ jobs:
             printf '%s\n' "$ASSETS" | grep -qxF "$want" || { echo "에셋 누락: $want" >&2; exit 1; }
           done
 
-          # 이름만 맞아도 checksums.txt 의 형식이 어긋나면 설치는 CHECKSUM_FAILED
-          # 로 깨진다. setup.md 와 같은 방식으로 실제 조회해 본다.
+          # 이름이 맞아도 checksums.txt의 형식이 어긋나면 설치는 CHECKSUM_FAILED로
+          # 깨진다. setup.md와 같은 방식으로 실제 조회해 본다.
           for name in $BINARIES; do
             SUM=$(awk -v n="$name" '$2 == n {print $1}' release/checksums.txt)
-            [ -n "$SUM" ] || { echo "checksums.txt 에서 조회 실패: $name" >&2; cat release/checksums.txt >&2; exit 1; }
+            [ -n "$SUM" ] || { echo "checksums.txt에서 조회 실패: $name" >&2; cat release/checksums.txt >&2; exit 1; }
             echo "  $name  $SUM"
           done

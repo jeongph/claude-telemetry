@@ -1,2 +1,5 @@
 config.json
 bin/
+
+# 내부 설계 문서 (로컬 전용)
+docs/superpowers/

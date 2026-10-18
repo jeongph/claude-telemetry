@@ -156,7 +156,7 @@ func ApplyColor(colorName string, s string, c Colors) string {
 // ProgressBarRemaining renders a horizontal progress bar based on remaining
 // percentage. Filled blocks are colored by threshold; empty blocks are dimmed.
 func ProgressBarRemaining(pct float64, width int, c Colors, warn, danger float64) string {
-	// width 0(또는 음수)은 "바 없이 % 만" 모드 — 바를 그리지 않는다.
+	// width 0(또는 음수)은 "바 없이 %만" 모드라서 바를 그리지 않는다.
 	if width <= 0 {
 		return ""
 	}

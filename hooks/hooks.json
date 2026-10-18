@@ -1,5 +1,5 @@
 {
-  "description": "플러그인-바이너리 버전 자동 동기화 (세션 시작 시)",
+  "description": "플러그인과 바이너리 버전 자동 동기화 (세션 시작 시)",
   "hooks": {
     "SessionStart": [
       {

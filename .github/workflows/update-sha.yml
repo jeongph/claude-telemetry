@@ -1,8 +1,8 @@
 name: Update marketplace SHA
 
-# auto-release 가 만드는 "chore(release): x.y.z" 커밋은 GITHUB_TOKEN 으로
-# push 되어 push 이벤트를 일으키지 않는다(재귀 방지). 그래서 릴리스가 날
-# 때마다 marketplace.json 이 낡은 채로 남았다. workflow_run 은 그 제약을
+# auto-release가 만드는 "chore(release): x.y.z" 커밋은 GITHUB_TOKEN으로
+# push되어 push 이벤트를 일으키지 않는다(재귀 방지). 그래서 릴리스가 날
+# 때마다 marketplace.json이 낡은 채로 남았다. workflow_run은 그 제약을
 # 받지 않으므로 릴리스가 끝난 뒤 이어서 돈다.
 on:
   push:
@@ -17,8 +17,8 @@ on:
 permissions:
   contents: write
 
-# auto-release.yml 과 같은 그룹을 써서 직렬화한다. 둘 다 main push 에
-# 반응해 각자 커밋을 push 하므로, 동시에 돌면 한쪽이 non-fast-forward 로
+# auto-release.yml과 같은 그룹을 써서 직렬화한다. 둘 다 main push에
+# 반응해 각자 커밋을 push하므로, 동시에 돌면 한쪽이 non-fast-forward로
 # 튕긴다.
 concurrency:
   group: main-push-writers-${{ github.ref }}
@@ -28,7 +28,7 @@ jobs:
   update-sha:
     runs-on: ubuntu-latest
     steps:
-      # ref 를 명시한다. workflow_run 으로 들어오면 github.sha 는 auto-release 가
+      # ref를 명시한다. workflow_run으로 들어오면 github.sha는 auto-release가
       # "시작된" 커밋이라 그 뒤에 얹힌 범프 커밋을 놓친다.
       - uses: actions/checkout@v5
         with:

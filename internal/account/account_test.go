@@ -38,27 +38,27 @@ func TestLoadReadsEmailAndPlan(t *testing.T) {
 func TestLoadMissingFileReturnsNil(t *testing.T) {
 	acc := Load(filepath.Join(t.TempDir(), "does-not-exist.json"))
 	if acc != nil {
-		t.Errorf("Load: 파일 없음인데 non-nil 반환 — %+v", acc)
+		t.Errorf("Load: 파일이 없는데 non-nil 반환: %+v", acc)
 	}
 }
 
 func TestLoadNoOAuthAccountReturnsNil(t *testing.T) {
 	path := writeClaudeJSON(t, `{"userID": "abc"}`)
 	if acc := Load(path); acc != nil {
-		t.Errorf("Load: oauthAccount 없음인데 non-nil 반환 — %+v", acc)
+		t.Errorf("Load: oauthAccount가 없는데 non-nil 반환: %+v", acc)
 	}
 }
 
 func TestLoadEmptyEmailReturnsNil(t *testing.T) {
 	path := writeClaudeJSON(t, `{"oauthAccount": {"emailAddress": "", "organizationType": "claude_max"}}`)
 	if acc := Load(path); acc != nil {
-		t.Errorf("Load: 이메일 빈값인데 non-nil 반환 — %+v", acc)
+		t.Errorf("Load: 이메일이 비었는데 non-nil 반환: %+v", acc)
 	}
 }
 
 func TestLoadMalformedJSONReturnsNil(t *testing.T) {
 	path := writeClaudeJSON(t, `{ not valid json `)
 	if acc := Load(path); acc != nil {
-		t.Errorf("Load: 깨진 JSON인데 non-nil 반환 — %+v", acc)
+		t.Errorf("Load: 깨진 JSON인데 non-nil 반환: %+v", acc)
 	}
 }

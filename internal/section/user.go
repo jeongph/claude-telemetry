@@ -3,8 +3,8 @@ package section
 import "github.com/jeongph/claude-telemetry/internal/render"
 
 // UserSection은 로그인 계정의 이메일과 플랜을 표시한다 (전용 줄, Line 4).
-// 이메일은 상태 라인 stdin JSON에 없어 ~/.claude.json에서 읽어오며(Context.Account),
-// 민감 정보이므로 기본 off(opt-in)다 — config에서 "user" 섹션을 켜야 나타난다.
+// 이메일은 상태 라인 stdin JSON에 없어 ~/.claude.json에서 읽어 오며(Context.Account),
+// 민감 정보이므로 기본값은 off(opt-in)다. config에서 "user" 섹션을 켜야 나타난다.
 // 예: "◉ user@example.com · Max"
 type UserSection struct{}
 
