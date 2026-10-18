@@ -123,7 +123,7 @@ type Worktree struct {
 
 // Parse는 바이트 슬라이스를 Input 구조체로 파싱한다.
 // model 필드는 오브젝트("id", "display_name") 또는 문자열 형태 모두 허용한다.
-// 문자열인 경우 ID와 DisplayName 모두 해당 문자열로 설정된다.
+// 문자열이면 ID와 DisplayName 모두 그 문자열로 설정된다.
 func Parse(data []byte) (*Input, error) {
 	if len(data) == 0 {
 		return nil, errors.New("input: 빈 데이터")

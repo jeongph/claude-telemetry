@@ -7,7 +7,7 @@ import (
 )
 
 // sessionNameMaxWidth는 세션명 표시 최대 컬럼 수다.
-// CC 2.1.170부터 자동 생성된 긴 세션 제목이 올 수 있어 절단이 필요하다 (실측 확인).
+// CC 2.1.170부터 자동 생성된 긴 세션 제목이 올 수 있어 절단이 필요하다 (직접 확인).
 const sessionNameMaxWidth = 20
 
 // SessionSection displays the session name (Line 1, Priority 6).
@@ -28,8 +28,8 @@ func (s *SessionSection) Render(ctx *Context) string {
 
 // truncateDisplay는 표시 폭 기준으로 문자열을 자르고 말줄임표를 붙인다.
 // 한글 등 와이드 문자는 2컬럼으로 계산된다.
-// XXX: 2026-06-10 이모지·전각 라틴은 render.DisplayWidth가 1컬럼으로 계산하므로
-// 포함 시 절단 위치가 다소 밀릴 수 있다 (표시가 깨지지는 않음).
+// XXX: 2026-06-10 이모지와 전각 라틴 문자는 render.DisplayWidth가 1컬럼으로 계산하므로
+// 이런 문자가 있으면 절단 위치가 다소 밀릴 수 있다 (표시가 깨지지는 않음).
 func truncateDisplay(s string, max int) string {
 	if render.DisplayWidth(s) <= max {
 		return s

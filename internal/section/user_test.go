@@ -25,19 +25,19 @@ func TestUserSectionRendersEmailAndPlan(t *testing.T) {
 	ctx := userContext(&account.Account{Email: "user@example.com", PlanType: "claude_max"})
 	got := (&UserSection{}).Render(ctx)
 	if !strings.Contains(got, "user@example.com") {
-		t.Errorf("이메일 누락 — got %q", got)
+		t.Errorf("이메일 누락: got %q", got)
 	}
 	if !strings.Contains(got, "Max") {
-		t.Errorf("플랜 축약 'Max' 누락 — got %q", got)
+		t.Errorf("플랜 축약 'Max' 누락: got %q", got)
 	}
 	if strings.Contains(got, "claude_max") {
-		t.Errorf("raw 플랜 타입이 그대로 노출됨 — got %q", got)
+		t.Errorf("raw 플랜 타입이 그대로 노출됨: got %q", got)
 	}
 }
 
 func TestUserSectionEmptyWhenNoAccount(t *testing.T) {
 	if got := (&UserSection{}).Render(userContext(nil)); got != "" {
-		t.Errorf("계정 없음인데 렌더됨 — got %q", got)
+		t.Errorf("계정이 없는데 렌더됨: got %q", got)
 	}
 }
 
@@ -46,10 +46,10 @@ func TestUserSectionRendersEmailWhenPlanUnknown(t *testing.T) {
 	ctx := userContext(&account.Account{Email: "a@b.com", PlanType: "weird_unknown"})
 	got := (&UserSection{}).Render(ctx)
 	if !strings.Contains(got, "a@b.com") {
-		t.Errorf("이메일 누락 — got %q", got)
+		t.Errorf("이메일 누락: got %q", got)
 	}
 	if strings.Contains(got, "weird_unknown") {
-		t.Errorf("미지 플랜 타입이 노출됨 — got %q", got)
+		t.Errorf("미지의 플랜 타입이 노출됨: got %q", got)
 	}
 }
 
