@@ -11,7 +11,7 @@
       "source": {
         "source": "url",
         "url": "https://github.com/jeongph/claude-telemetry.git",
-        "sha": "51835ab83ea4c6088a90e09070d5c7fb90ade085"
+        "sha": "a5df0c6a01e5bedfb004e17b40e6c95d732de917"
       },
       "description": "남은 컨텍스트와 사용 한도, 추론 수준, Git 상태, 토큰 수를 터미널 하단에 표시합니다.",
       "version": "2.6.0"
