@@ -103,7 +103,7 @@ func TestLine4DedicatedRow(t *testing.T) {
 		t.Fatalf("전용 user 줄 포함 4줄이어야 함, got %d", len(lines))
 	}
 	if !strings.Contains(lines[3], "user@example.com") {
-		t.Errorf("line4에 user 세그먼트 누락 — got %q", lines[3])
+		t.Errorf("line4에 user 세그먼트 누락: got %q", lines[3])
 	}
 }
 

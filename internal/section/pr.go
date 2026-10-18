@@ -7,7 +7,7 @@ import (
 )
 
 // PRSection displays the open pull request for the current branch (Line 1, Priority 5).
-// Claude Code 2.1.145+ 의 pr 입력을 사용한다. 열린 PR이 없으면 표시하지 않는다.
+// Claude Code 2.1.145+의 pr 입력을 사용한다. 열린 PR이 없으면 표시하지 않는다.
 type PRSection struct{}
 
 func (s *PRSection) Name() string  { return "pr" }
@@ -18,8 +18,8 @@ func (s *PRSection) Render(ctx *Context) string {
 	if pr == nil || pr.Number == 0 {
 		return ""
 	}
-	// 리뷰 상태 기호는 번호 앞에 둔다 — 번호 뒤에 붙으면 ◌·● 등이
-	// 숫자 0·o와 붙어 보여 오인될 수 있다 (예: "PR#8◌" → "PR#80").
+	// 리뷰 상태 기호는 번호 앞에 둔다. 번호 뒤에 붙으면 ◌나 ● 같은 기호가
+	// 숫자 0이나 o와 붙어 보여 오인될 수 있다 (예: "PR#8◌" → "PR#80").
 	var mark string
 	switch pr.ReviewState {
 	case "approved":

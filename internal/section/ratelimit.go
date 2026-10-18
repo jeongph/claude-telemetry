@@ -20,11 +20,11 @@ func (s *RateLimitSection) Render(ctx *Context) string {
 
 	// rate_limits가 nil: OAuth 초기 상태면 ··· 표시, API key 사용자면 미표시
 	if rl == nil {
-		// cost > 0이면 API key 사용자 → 미표시
+		// cost > 0이면 API key 사용자이므로 미표시
 		if ctx.Input.Cost.TotalCostUSD > 0 {
 			return ""
 		}
-		// OAuth 초기 상태 → 대기 표시
+		// OAuth 초기 상태면 대기 표시
 		loading := ctx.Colors.Dim("5h") + " " + ctx.Colors.Dim("···") +
 			" " + ctx.Colors.Dim("/") + " " +
 			ctx.Colors.Dim("7d") + " " + ctx.Colors.Dim("···")
@@ -62,7 +62,7 @@ func (s *RateLimitSection) Width(ctx *Context) int {
 // renderRateWindow renders a single rate limit window.
 // remaining = 100 - used_percentage (stdin gives used, we show remaining).
 func renderRateWindow(usedPct float64, resetsAt float64, label string, ctx *Context) string {
-	// resets_at이 과거 → 리셋됨, 정확한 값 알 수 없음
+	// resets_at이 과거면 이미 리셋되어 정확한 값을 알 수 없음
 	if resetsAt > 0 {
 		resetTime := time.Unix(int64(resetsAt), 0)
 		if time.Now().After(resetTime) {
@@ -102,7 +102,7 @@ func renderRateWindow(usedPct float64, resetsAt float64, label string, ctx *Cont
 
 	labelStr := ctx.Colors.Dim(label)
 
-	// bar_width 0이면 바가 빈 문자열 — 바와 그 앞 공백을 생략한다.
+	// bar_width 0이면 바가 빈 문자열이므로 바와 그 앞 공백을 생략한다.
 	result := labelStr
 	if bar != "" {
 		result += " " + bar

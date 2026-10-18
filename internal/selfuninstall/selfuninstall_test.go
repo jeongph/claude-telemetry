@@ -65,7 +65,7 @@ func TestRemoveStatusLineIdempotent(t *testing.T) {
 	}
 	data, _ := os.ReadFile(settings)
 	if string(data) != original {
-		t.Error("statusLine 없는 파일이 변경됨 — no-op이어야 함")
+		t.Error("statusLine 없는 파일이 변경됨 (no-op이어야 함)")
 	}
 	if _, err := os.Stat(settings + ".claude-telemetry.bak"); err == nil {
 		t.Error("no-op인데 백업이 생성됨")
@@ -113,13 +113,13 @@ func TestCleanupFiles(t *testing.T) {
 			t.Errorf("%s가 제거되지 않음", gone)
 		}
 	}
-	// run.sh는 삭제가 아니라 무해화 스텁으로 교체 (현재 세션이 계속 호출하므로)
+	// run.sh는 삭제하지 않고 아무 동작도 하지 않는 스텁으로 교체 (현재 세션이 계속 호출하므로)
 	stub, err := os.ReadFile(filepath.Join(dir, "run.sh"))
 	if err != nil {
 		t.Fatal("run.sh 스텁이 없음")
 	}
 	if !strings.Contains(string(stub), "exit 0") {
-		t.Errorf("run.sh가 무해화 스텁이 아님: %q", string(stub))
+		t.Errorf("run.sh가 아무 동작도 하지 않는 스텁이 아님: %q", string(stub))
 	}
 }
 
@@ -129,7 +129,7 @@ func TestRunWithLock(t *testing.T) {
 	os.MkdirAll(slDir, 0o755)
 	settings := filepath.Join(claudeDir, "settings.json")
 	writeFile(t, settings, `{"statusLine": {"type": "command"}}`)
-	// 락 선점 → Run은 조용히 no-op
+	// 락이 선점되어 있으면 Run은 조용히 no-op
 	writeFile(t, filepath.Join(slDir, ".uninstall.lock"), "")
 
 	if err := Run(claudeDir, slDir); err != nil {
@@ -147,7 +147,7 @@ func TestRunStaleLockRecovery(t *testing.T) {
 	os.MkdirAll(slDir, 0o755)
 	settings := filepath.Join(claudeDir, "settings.json")
 	writeFile(t, settings, `{"statusLine": {"type": "command"}}`)
-	// 11분 전 mtime의 stale 락 → 회수 후 정리 수행되어야 함
+	// mtime이 11분 전인 stale 락은 회수한 뒤 정리를 수행해야 함
 	lock := filepath.Join(slDir, ".uninstall.lock")
 	writeFile(t, lock, "")
 	old := time.Now().Add(-11 * time.Minute)

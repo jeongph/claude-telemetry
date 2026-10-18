@@ -40,7 +40,7 @@ func (s *ContextSection) Render(ctx *Context) string {
 	)
 	pctStr := render.ApplyColor(colorName, fmt.Sprintf("%.0f%%", remaining), ctx.Colors)
 
-	// bar_width 0이면 바가 빈 문자열 — 바와 양옆 공백을 생략한다.
+	// bar_width 0이면 바가 빈 문자열이므로 바와 양옆 공백을 생략한다.
 	if bar == "" {
 		return prefix + " " + pctStr
 	}

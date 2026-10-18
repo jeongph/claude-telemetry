@@ -63,7 +63,7 @@ func TestParseNormalInput(t *testing.T) {
 
 	// OutputStyle
 	if inp.OutputStyle == nil {
-		t.Fatal("OutputStyle가 nil이면 안 됨")
+		t.Fatal("OutputStyle이 nil이면 안 됨")
 	}
 	if inp.OutputStyle.Name != "default" {
 		t.Errorf("OutputStyle.Name = %q, want %q", inp.OutputStyle.Name, "default")
@@ -152,7 +152,7 @@ func TestParseModelAsString(t *testing.T) {
 		t.Fatalf("Parse 실패: %v", err)
 	}
 
-	// model 필드가 문자열인 경우 ID와 DisplayName 모두 해당 문자열로 설정
+	// model 필드가 문자열이면 ID와 DisplayName 모두 그 문자열로 설정
 	if inp.Model.ID != "claude-opus-4-6" {
 		t.Errorf("Model.ID = %q, want %q", inp.Model.ID, "claude-opus-4-6")
 	}

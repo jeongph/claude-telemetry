@@ -32,7 +32,7 @@ func acquireLock(lock string) bool {
 	return false
 }
 
-// runShStub은 정리 후 run.sh에 남기는 무해화 스텁이다.
+// runShStub은 정리 후 run.sh에 남기는, 아무 동작도 하지 않는 스텁이다.
 // 현재 떠 있는 세션이 statusline 명령을 계속 호출하므로 빈 출력으로 응답해야 한다.
 // 다음 세션부터는 settings.json에 등록이 없어 호출되지 않는다.
 const runShStub = "#!/bin/bash\n# claude-telemetry removed — this stub is safe to delete\nexit 0\n"
@@ -79,7 +79,7 @@ func RemoveStatusLine(settingsPath string) error {
 }
 
 // CleanupFiles는 statusline 디렉토리의 구성 요소를 정리하고 run.sh를 스텁으로 교체한다.
-// run.sh 자체는 삭제하지 않는다 — 현재 세션이 계속 호출하기 때문.
+// run.sh 자체는 삭제하지 않는다. 현재 세션이 계속 호출하기 때문이다.
 func CleanupFiles(statuslineDir string) error {
 	for _, f := range []string{"config.json", ".managed-by-plugin", ".removal-detected"} {
 		if err := os.Remove(filepath.Join(statuslineDir, f)); err != nil && !errors.Is(err, fs.ErrNotExist) {
